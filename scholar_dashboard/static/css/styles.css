@@ -68,6 +68,73 @@
   --shadow-lg: 0 10px 20px -3px rgba(0, 0, 0, 0.08);
 }
 
+/* Light Theme Component Polish */
+[data-theme="light"] .dropzone {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .dropzone:hover,
+[data-theme="light"] .dropzone.drag-active {
+  background: #eff6ff;
+  border-color: #3b82f6;
+}
+
+[data-theme="light"] .custom-table th {
+  background: #f1f5f9;
+  color: #475569;
+  border-bottom-color: #e2e8f0;
+}
+
+[data-theme="light"] .custom-table td {
+  border-bottom-color: #e2e8f0;
+}
+
+[data-theme="light"] .custom-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+[data-theme="light"] .leaderboard-row {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .leaderboard-row:hover {
+  background: #ffffff;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .candidate-card {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+[data-theme="light"] .candidate-card:hover {
+  background: #ffffff;
+  border-color: #3b82f6;
+}
+
+[data-theme="light"] .status-pill {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+[data-theme="light"] .text-input {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #0f172a;
+}
+
+[data-theme="light"] .filter-pills {
+  background: #e2e8f0;
+  border-color: #cbd5e1;
+}
+
+[data-theme="light"] .filter-pill {
+  color: #475569;
+}
+
 /* Base Styles */
 * {
   box-sizing: border-box;
@@ -394,22 +461,77 @@ h1, h2, h3, h4, h5, .brand-title {
 
 /* Toggle Switch */
 .switch-wrapper {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 10px;
   font-size: 13px;
-  color: var(--text-muted);
+  font-weight: 500;
+  color: var(--text-main);
+  background: rgba(30, 41, 59, 0.5);
+  border: 1px solid var(--border-subtle);
+  padding: 6px 14px;
+  border-radius: 30px;
   cursor: pointer;
+  user-select: none;
+  transition: all var(--trans-fast);
+}
+
+.switch-wrapper:hover {
+  border-color: var(--border-focus);
+  background: rgba(30, 41, 59, 0.75);
+}
+
+[data-theme="light"] .switch-wrapper {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+[data-theme="light"] .switch-wrapper:hover {
+  background: #e2e8f0;
+  border-color: #94a3b8;
+}
+
+.switch-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.switch-badge {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: 12px;
+  background: rgba(139, 92, 246, 0.18);
+  color: #a78bfa;
+  border: 1px solid rgba(139, 92, 246, 0.35);
+}
+
+[data-theme="light"] .switch-badge {
+  background: rgba(139, 92, 246, 0.12);
+  color: #7c3aed;
+  border-color: rgba(139, 92, 246, 0.25);
 }
 
 .toggle-switch {
   position: relative;
-  width: 40px;
-  height: 22px;
-  background: var(--bg-input);
+  width: 44px;
+  height: 24px;
+  background: #334155; /* Slate-700 track in dark mode */
   border-radius: 20px;
-  border: 1px solid var(--border-subtle);
-  transition: background var(--trans-fast);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: background var(--trans-smooth), border-color var(--trans-smooth), box-shadow var(--trans-smooth);
+  flex-shrink: 0;
+}
+
+[data-theme="light"] .toggle-switch {
+  background: #cbd5e1; /* Clear contrasting track in light mode */
+  border-color: #94a3b8;
 }
 
 .toggle-switch::after {
@@ -417,20 +539,30 @@ h1, h2, h3, h4, h5, .brand-title {
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   background: #ffffff;
   border-radius: 50%;
-  transition: transform var(--trans-fast);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  transition: transform var(--trans-smooth), background-color var(--trans-smooth), box-shadow var(--trans-smooth);
 }
 
 input[type="checkbox"]:checked + .toggle-switch {
-  background: var(--accent-primary);
-  border-color: var(--accent-primary);
+  background: linear-gradient(135deg, var(--accent-primary) 0%, #2563eb 100%);
+  border-color: #2563eb;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.35);
 }
 
 input[type="checkbox"]:checked + .toggle-switch::after {
-  transform: translateX(18px);
+  transform: translateX(20px);
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Accessibility Focus Outline */
+input[type="checkbox"]:focus-visible + .toggle-switch {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 2px;
 }
 
 /* Progress Drawer */

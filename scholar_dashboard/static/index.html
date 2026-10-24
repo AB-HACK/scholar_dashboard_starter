@@ -50,13 +50,14 @@
         <h2 class="panel-title">
           <span>📂</span> Faculty Roster Ingestion & Discovery Controls
         </h2>
-        <div class="switch-wrapper">
-          <label for="mockToggle" style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
-            <input type="checkbox" id="mockToggle" style="display: none;">
-            <span class="toggle-switch"></span>
-            <span>Demo / Mock Mode (Zero API Credits)</span>
-          </label>
-        </div>
+        <label for="mockToggle" class="switch-wrapper" id="mockToggleWrapper" title="Toggle simulated test mode with zero SerpApi credit usage">
+          <input type="checkbox" id="mockToggle" style="display: none;">
+          <span class="toggle-switch"></span>
+          <span class="switch-label">
+            Demo / Mock Mode
+            <span class="switch-badge">Zero Credits</span>
+          </span>
+        </label>
       </div>
 
       <div class="upload-grid">
