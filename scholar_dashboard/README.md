@@ -1,51 +1,63 @@
-# University Research Analytics Dashboard
+# UniScholar Analytics Platform — Academic Research Dashboard
 
-A Streamlit starter app for uploading department staff lists, discovering candidate Google Scholar profiles through SerpApi, retrieving profile metrics, and exporting CSV/Excel reports.
+An executive research intelligence dashboard for university faculties. Upload department staff rosters, automatically discover Google Scholar profiles via SerpApi, extract citation metrics ($all$ & $recent$, $h$-index, $i10$-index), resolve candidate disambiguation, and generate formatted institutional reports.
 
-## Important limitations
+---
 
-- Google Scholar does not offer an official public API for bulk profile and citation-metric retrieval.
-- This app uses SerpApi as a third-party provider. Check its current pricing, quotas, data terms, and Google Scholar-related terms before use.
-- Profile discovery is not identity proof. Results are deliberately marked `Needs verification`; check the profile name, affiliation, and publications before using results in official reports.
-- Metrics may be missing for profiles that are private, unavailable, or not indexed.
+## 🌟 Key Features
 
-## Run locally
+- **Executive Web Dashboard**: High-aesthetic, responsive dark/light mode dashboard with Chart.js analytics.
+- **Automated Column Mapper**: Intelligently identifies faculty names and department columns in Excel (`.xlsx`, `.xls`) and CSV files.
+- **Candidate Disambiguation Studio**: When multiple scholars match a name, review all candidates and switch profiles with one click.
+- **Department Research Footprint**: Aggregate and compare citation impact, average $h$-index, and leaderboards across disciplines.
+- **Smart Quota Caching & Demo Mode**: Avoid redundant paid SerpApi requests with local response caching and zero-credit simulated demo data.
+- **Multi-Sheet Excel & CSV Export**: Export formatted executive reports with summary KPIs, full rosters, and verification follow-up lists.
 
-1. Install Python 3.10 or newer.
-2. Open a terminal in this folder.
-3. Create and activate a virtual environment (optional but recommended):
+---
 
-   Windows PowerShell:
+## 🚀 Running the Modern Web Dashboard (Recommended)
+
+1. Activate your virtual environment:
 
    ```powershell
-   py -m venv .venv
    .\.venv\Scripts\Activate.ps1
    ```
 
-4. Install dependencies:
+2. Start the executive web dashboard:
 
    ```powershell
-   pip install -r requirements.txt
+   python main.py
    ```
 
-5. Start the app:
+3. Open your browser at **[http://127.0.0.1:8000](http://127.0.0.1:8000)**.
 
-   ```powershell
-   streamlit run app.py
-   ```
+---
 
-6. Add your SerpApi key in the sidebar, upload the staff Excel file, and click **Discover profiles and collect metrics**.
+## 💻 Alternative: Running via Streamlit
 
-You can alternatively set `SERPAPI_API_KEY` as an environment variable before starting the app.
+If you prefer the companion Streamlit interface:
 
-## Expected input
+```powershell
+streamlit run app.py
+```
 
-An Excel or CSV file with a staff-name column and preferably a department column. Column names such as `Names`, `Staff Name`, `Full Name`, `Department`, and `Dept` are detected automatically.
+---
 
-## Next improvements
+## 📁 Architecture Overview
 
-- Add a review screen to select the correct candidate when multiple profiles are returned.
-- Persist verified profile IDs and past snapshots in SQLite.
-- Add charts and department summary KPIs.
-- Add retries, provider quota tracking, and caching.
-- Compare results against manually verified Google Scholar profile values before formal reporting.
+```
+scholar_dashboard/
+├── core/                     # Modular analytics & API engine
+│   ├── config.py             # Safe credential & secrets handling
+│   ├── parser.py             # Excel/CSV parser & fuzzy column detection
+│   ├── scholar_client.py     # SerpApi Google Scholar client & caching
+│   ├── analytics.py          # Department aggregation & KPI calculations
+│   └── exporter.py           # Multi-sheet Excel and CSV export generator
+├── static/                   # Modern Web Dashboard assets
+│   ├── index.html            # Dashboard semantic layout & Chart.js containers
+│   ├── css/styles.css        # Glassmorphism styling, CSS tokens & themes
+│   └── js/app.js             # Real-time state management, filters & modals
+├── server.py                 # FastAPI backend server linking UI to core engine
+├── main.py                   # Single-command runner for the modern web app
+└── app.py                    # Streamlit companion app
+```

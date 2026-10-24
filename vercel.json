@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "scholar_dashboard/api/index.py",
+      "use": "@vercel/python",
+      "config": { "maxDuration": 60 }
+    },
+    {
+      "src": "scholar_dashboard/static/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "scholar_dashboard/api/index.py"
+    },
+    {
+      "src": "/css/(.*)",
+      "dest": "scholar_dashboard/static/css/$1"
+    },
+    {
+      "src": "/js/(.*)",
+      "dest": "scholar_dashboard/static/js/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "scholar_dashboard/static/index.html"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: unischolar-analytics
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: ENV
+        value: production
+      - key: SERPAPI_API_KEY
+        sync: false

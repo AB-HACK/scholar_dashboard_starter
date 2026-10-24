@@ -1,0 +1,10 @@
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.streamlit/secrets.toml
+scholar_dashboard/.streamlit/secrets.toml
+scholar_dashboard/data/cache.json
+*.log
+.DS_Store
+Thumbs.db

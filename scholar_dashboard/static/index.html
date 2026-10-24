@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UniScholar Analytics — Academic Research Impact Dashboard</title>
+  <meta name="description" content="Executive research dashboard for discovering Google Scholar profiles, tracking citations, h-index metrics, and institutional department analytics.">
+  
+  <!-- Modern Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <div class="dashboard-container">
+    
+    <!-- Top Navigation Bar -->
+    <header class="topbar">
+      <div class="brand-wrapper">
+        <div class="brand-icon">📚</div>
+        <div>
+          <div class="brand-title">
+            UniScholar Analytics
+            <span class="brand-badge">Executive</span>
+          </div>
+          <div class="brand-sub">Institutional Research Impact & Faculty Citation Intelligence</div>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <div id="statusPill" class="status-pill">
+          <span class="status-dot"></span>
+          <span id="statusText">Checking status...</span>
+        </div>
+        <button id="themeToggleBtn" class="btn btn-secondary btn-icon" title="Toggle Theme">☀️</button>
+        <button id="settingsBtn" class="btn btn-secondary btn-icon" title="API Configuration">⚙️</button>
+      </div>
+    </header>
+
+    <!-- Ingestion & Control Panel -->
+    <section class="ingestion-panel">
+      <div class="panel-header">
+        <h2 class="panel-title">
+          <span>📂</span> Faculty Roster Ingestion & Discovery Controls
+        </h2>
+        <div class="switch-wrapper">
+          <label for="mockToggle" style="cursor: pointer; display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="mockToggle" style="display: none;">
+            <span class="toggle-switch"></span>
+            <span>Demo / Mock Mode (Zero API Credits)</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="upload-grid">
+        <!-- Dropzone -->
+        <div id="dropzone" class="dropzone">
+          <input type="file" id="fileInput" accept=".xlsx, .xls, .csv" style="display: none;">
+          <div class="dropzone-icon">📥</div>
+          <div class="dropzone-title">Drop Faculty Excel (.xlsx, .xls) or CSV here</div>
+          <div class="dropzone-sub">Automatic detection for Staff Name & Department columns</div>
+        </div>
+
+        <!-- Parameters & Controls -->
+        <div style="display: flex; flex-direction: column; gap: 14px; justify-content: center;">
+          <div class="input-group">
+            <label class="input-label" for="institutionInput">Affiliated Institution</label>
+            <input type="text" id="institutionInput" class="text-input" value="University of Lagos" placeholder="e.g. University of Lagos">
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <button id="sampleBtn" class="btn btn-secondary" style="flex: 1;" title="Load test faculty roster">
+              🧪 Load Sample Roster
+            </button>
+          </div>
+        </div>
+
+        <!-- Action Runner -->
+        <div style="display: flex; flex-direction: column; justify-content: center; gap: 12px;">
+          <button id="runBtn" class="btn btn-primary" style="height: 52px; font-size: 15px;" disabled>
+            🚀 Run Discovery & Citation Analysis
+          </button>
+          <div id="uploadInfo" style="display: none; font-size: 12px; color: var(--accent-primary); text-align: center;">
+            <span id="uploadInfoText"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Batch Execution Progress Drawer -->
+      <div id="progressContainer" class="progress-container">
+        <div class="progress-header">
+          <span id="progressStatus" class="progress-status">Searching Google Scholar...</span>
+          <span id="progressPct" style="font-weight: 700; color: var(--text-main);">0%</span>
+        </div>
+        <div class="progress-track">
+          <div id="progressFill" class="progress-fill"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Executive KPI Cards -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-title">Total Faculty Ingested</span>
+          <div class="kpi-icon blue">👥</div>
+        </div>
+        <div id="kpiTotalStaff" class="kpi-value">—</div>
+        <div class="kpi-footer">Across all departments</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-title">Profile Match Rate</span>
+          <div class="kpi-icon green">🎯</div>
+        </div>
+        <div id="kpiMatchRate" class="kpi-value">—</div>
+        <div id="kpiVerifiedRatio" class="kpi-footer">0 Verified</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-title">Total Citations</span>
+          <div class="kpi-icon purple">📈</div>
+        </div>
+        <div id="kpiTotalCitations" class="kpi-value">—</div>
+        <div class="kpi-footer">All-time citations index</div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-top">
+          <span class="kpi-title">Average h-Index</span>
+          <div class="kpi-icon amber">🏆</div>
+        </div>
+        <div id="kpiAvgHIndex" class="kpi-value">—</div>
+        <div class="kpi-footer">Department benchmark</div>
+      </div>
+    </section>
+
+    <!-- Analytics & Leaderboard Section -->
+    <section class="analytics-grid">
+      <!-- Department Footprint Chart -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">📊 Departmental Citation Footprint</h3>
+          <span style="font-size: 12px; color: var(--text-faint);">Total citations by department</span>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="deptChart"></canvas>
+        </div>
+      </div>
+
+      <!-- h-Index Distribution Chart -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">🎯 Faculty h-Index Distribution</h3>
+          <span style="font-size: 12px; color: var(--text-faint);">Productivity tiers</span>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="distChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- Research Impact Leaderboard -->
+    <section class="chart-card">
+      <div class="chart-header">
+        <h3 class="chart-title">🏆 Top Faculty Citation Leaderboard</h3>
+        <span style="font-size: 12px; color: var(--text-faint);">Ranked by global academic citation count</span>
+      </div>
+      <div id="leaderboardList" class="leaderboard-list">
+        <div class="empty-state">
+          <span class="empty-icon">📈</span>
+          <p>Load faculty data or run discovery to populate citation leaders.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Detailed Roster & Verification Workhorse Grid -->
+    <section class="table-panel">
+      <div class="table-toolbar">
+        <div>
+          <h3 class="panel-title">📋 Faculty Citation Roster & Disambiguation Review</h3>
+          <div id="tableCountLabel" style="font-size: 12px; color: var(--text-muted);">Showing 0 faculty</div>
+        </div>
+
+        <div class="table-filters">
+          <div class="search-input-wrapper">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" class="text-input" placeholder="Search faculty or affiliation...">
+          </div>
+
+          <select id="deptFilterSelect" class="text-input" style="width: auto;">
+            <option value="all">All Departments</option>
+          </select>
+
+          <div class="filter-pills">
+            <button class="filter-pill active" data-status="all">All</button>
+            <button class="filter-pill" data-status="verified">Verified</button>
+            <button class="filter-pill" data-status="needs">Review</button>
+            <button class="filter-pill" data-status="unmatched">Unmatched</button>
+          </div>
+
+          <div style="display: flex; gap: 8px;">
+            <button id="exportExcelBtn" class="btn btn-secondary btn-sm" disabled title="Download formatted multi-sheet Excel">
+              📊 Export Excel
+            </button>
+            <button id="exportCsvBtn" class="btn btn-secondary btn-sm" disabled title="Download CSV">
+              📄 Export CSV
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th style="width: 130px;">Verification</th>
+              <th>Faculty Name</th>
+              <th>Discovered Scholar Profile</th>
+              <th>Citations</th>
+              <th>h-Index</th>
+              <th>i10-Index</th>
+              <th style="width: 140px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="rosterTableBody">
+            <tr>
+              <td colspan="7">
+                <div class="empty-state">
+                  <span class="empty-icon">📄</span>
+                  <p>Upload a staff spreadsheet or click "Load Sample Roster" to view metrics.</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer style="text-align: center; font-size: 12px; color: var(--text-faint); margin-top: 10px;">
+      UniScholar Analytics &bull; Google Scholar discovery powered by SerpApi &bull; Verify all candidate profiles before official reporting.
+    </footer>
+
+  </div>
+
+  <!-- Candidate Disambiguation Modal -->
+  <div id="candidateModal" class="modal-backdrop">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 id="candidateModalTitle" class="modal-title">Candidate Profile Review</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="font-size: 13px; color: var(--text-muted);">
+          Select the correct Google Scholar profile for this faculty member to update citations and verify identity:
+        </div>
+        <div id="candidateModalBody" style="display: flex; flex-direction: column; gap: 12px;"></div>
+        
+        <div style="border-top: 1px solid var(--border-subtle); padding-top: 14px; margin-top: 6px;">
+          <label class="input-label" for="manualAuthorIdInput">Or Enter Manual Scholar Author ID / URL</label>
+          <div style="display: flex; gap: 8px; margin-top: 6px;">
+            <input type="text" id="manualAuthorIdInput" class="text-input" placeholder="e.g. 04611b2832c1 or scholar URL">
+            <button id="manualMatchBtn" class="btn btn-secondary btn-sm">Assign ID</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings & Configuration Modal -->
+  <div id="configModal" class="modal-backdrop">
+    <div class="modal-card" style="max-width: 500px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Configuration & API Credentials</h3>
+        <button class="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="input-group">
+          <label class="input-label" for="configApiKey">SerpApi API Key</label>
+          <input type="password" id="configApiKey" class="text-input" placeholder="Paste your SerpApi key here">
+          <span style="font-size: 11px; color: var(--text-faint);">Saved locally to <code>.streamlit/secrets.toml</code> and environment.</span>
+        </div>
+        <div class="input-group">
+          <label class="input-label" for="configInstitution">Default Institution</label>
+          <input type="text" id="configInstitution" class="text-input" value="University of Lagos" placeholder="e.g. University of Lagos">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary modal-close">Cancel</button>
+        <button id="saveConfigBtn" class="btn btn-primary">Save Settings</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Script -->
+  <script src="/js/app.js"></script>
+</body>
+</html>
