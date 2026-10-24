@@ -1,10 +1,35 @@
-.venv/
-venv/
-__pycache__/
-*.py[cod]
+# ==========================================
+# UniScholar Repository .gitignore
+# ==========================================
+
+# Secrets & Credentials (Never commit API keys)
 .streamlit/secrets.toml
 scholar_dashboard/.streamlit/secrets.toml
+*.env
+.env*
+
+# Python & Virtual Environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# Local Cache & Data
+data/cache.json
 scholar_dashboard/data/cache.json
 *.log
+
+# Deployments & Tooling
+.vercel
+.ipynb_checkpoints/
+.vscode/
+.idea/
+
+# OS Generated Files
 .DS_Store
 Thumbs.db
