@@ -286,6 +286,235 @@ h1, h2, h3, h4, h5, .brand-title {
   box-shadow: 0 0 8px var(--accent-purple);
 }
 
+/* Credit Balance Pill (Topbar) */
+.credit-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 13px;
+  border-radius: 30px;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color var(--trans-smooth), box-shadow var(--trans-smooth), color var(--trans-smooth);
+  user-select: none;
+}
+
+.credit-pill:hover {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 10px var(--accent-primary-glow);
+}
+
+.credit-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.credit-pill.healthy {
+  border-color: rgba(16, 185, 129, 0.4);
+  color: var(--accent-success);
+}
+
+.credit-pill.low {
+  border-color: rgba(245, 158, 11, 0.5);
+  color: var(--accent-warning);
+  animation: creditPulse 2.5s ease-in-out infinite;
+}
+
+.credit-pill.critical {
+  border-color: rgba(239, 68, 68, 0.5);
+  color: var(--accent-danger);
+  animation: creditPulse 1.5s ease-in-out infinite;
+}
+
+.credit-pill.depleted {
+  border-color: var(--accent-danger);
+  color: var(--accent-danger);
+  background: var(--accent-danger-bg);
+  animation: creditPulse 1s ease-in-out infinite;
+}
+
+.credit-pill.mock {
+  border-color: rgba(139, 92, 246, 0.35);
+  color: var(--accent-purple);
+}
+
+@keyframes creditPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+
+/* Credit Alert Warning Banner */
+.credit-alert-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, rgba(239, 68, 68, 0.06) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  animation: bannerSlideIn 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.credit-alert-banner.critical,
+.credit-alert-banner.depleted {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(239, 68, 68, 0.04) 100%);
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+@keyframes bannerSlideIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.alert-icon-box {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.alert-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.alert-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent-warning);
+  margin-bottom: 2px;
+}
+
+.credit-alert-banner.critical .alert-title,
+.credit-alert-banner.depleted .alert-title {
+  color: var(--accent-danger);
+}
+
+.alert-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.alert-actions {
+  flex-shrink: 0;
+}
+
+/* Warning button variant */
+.btn-warning {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+}
+
+.btn-warning:hover {
+  background: linear-gradient(135deg, #d97706, #b45309);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+}
+
+/* Extra-small button */
+.btn-xs {
+  padding: 4px 10px;
+  font-size: 11px;
+  border-radius: 6px;
+}
+
+/* Account Quota Card (Settings Modal) */
+.account-card {
+  margin-top: 8px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+}
+
+.account-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.account-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.account-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.account-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.account-item-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+  font-weight: 600;
+}
+
+.account-item-val {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-main);
+  word-break: break-all;
+}
+
+.account-item-val.highlight {
+  font-size: 22px;
+  font-weight: 800;
+  font-family: 'Outfit', sans-serif;
+  background: linear-gradient(135deg, var(--accent-success) 0%, var(--accent-cyan) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.account-item-val.highlight.low {
+  background: linear-gradient(135deg, var(--accent-warning) 0%, #fbbf24 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.account-item-val.highlight.critical,
+.account-item-val.highlight.depleted {
+  background: linear-gradient(135deg, var(--accent-danger) 0%, #f87171 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.account-card-warning {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.account-card-warning.critical,
+.account-card-warning.depleted {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.25);
+}
+
 /* Control Ingestion Section */
 .ingestion-panel {
   background: var(--bg-card);

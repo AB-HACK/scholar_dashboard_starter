@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional
 import requests
 
 SERPAPI_URL = "https://serpapi.com/search.json"
+SERPAPI_ACCOUNT_URL = "https://serpapi.com/account"
 CACHE_FILE = Path(__file__).resolve().parent.parent / "data" / "cache.json"
 
 
@@ -66,6 +67,89 @@ class ScholarClient:
                 time.sleep(1.0 * (attempt + 1))
 
         raise RuntimeError(f"SerpApi request failed after 3 attempts: {last_error}")
+
+    def get_account_info(self, use_mock: bool = False) -> Dict[str, Any]:
+        """Fetch SerpApi account details including remaining searches/credits.
+        
+        This request to the account endpoint is free of charge and does not consume credits.
+        """
+        if use_mock or not self.api_key:
+            return {
+                "account_email": "demo@unischolar.edu" if use_mock else "unconfigured",
+                "plan_name": "Demo / Mock Tier (Zero Credits)" if use_mock else "No API Key Set",
+                "searches_per_month": 1000,
+                "plan_searches_left": 1000,
+                "total_searches_left": 1000,
+                "this_month_usage": 0,
+                "is_mock": True,
+                "status": "mock",
+                "warning": None
+            }
+
+        try:
+            resp = requests.get(
+                SERPAPI_ACCOUNT_URL,
+                params={"api_key": self.api_key},
+                timeout=12
+            )
+            if resp.status_code == 401:
+                return {
+                    "error": "Invalid or unauthorized SerpApi key",
+                    "plan_searches_left": 0,
+                    "total_searches_left": 0,
+                    "is_mock": False,
+                    "status": "error",
+                    "warning": "Authentication error: SerpApi key is invalid or unauthorized."
+                }
+            resp.raise_for_status()
+            data = resp.json()
+            if data.get("error"):
+                return {
+                    "error": data.get("error"),
+                    "plan_searches_left": 0,
+                    "total_searches_left": 0,
+                    "is_mock": False,
+                    "status": "error",
+                    "warning": f"SerpApi Error: {data.get('error')}"
+                }
+
+            searches_left = data.get("total_searches_left")
+            if searches_left is None:
+                searches_left = data.get("plan_searches_left", 0)
+
+            status = "healthy"
+            warning = None
+            if searches_left <= 0:
+                status = "depleted"
+                warning = "SerpApi credit balance is 0. Live searches will fail! Please switch to Demo Mode or recharge your plan."
+            elif searches_left < 50:
+                status = "critical"
+                warning = f"Critical Low Balance: Only {searches_left} searches remaining. Consider enabling Demo Mode to preserve credits."
+            elif searches_left < 150:
+                status = "low"
+                warning = f"Low Credit Warning: {searches_left} searches remaining in current billing cycle."
+
+            return {
+                "account_email": data.get("account_email", ""),
+                "plan_name": data.get("plan_name", "Standard Plan"),
+                "searches_per_month": data.get("searches_per_month", 0),
+                "plan_searches_left": data.get("plan_searches_left", searches_left),
+                "total_searches_left": searches_left,
+                "this_month_usage": data.get("this_month_usage", 0),
+                "account_rate_limit_per_hour": data.get("account_rate_limit_per_hour"),
+                "is_mock": False,
+                "status": status,
+                "warning": warning
+            }
+        except requests.RequestException as e:
+            return {
+                "error": f"Network error checking account: {str(e)}",
+                "plan_searches_left": None,
+                "total_searches_left": None,
+                "is_mock": False,
+                "status": "offline",
+                "warning": "Could not connect to SerpApi account service to verify remaining balance."
+            }
 
     def discover_candidates(
         self,

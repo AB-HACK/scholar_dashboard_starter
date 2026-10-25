@@ -17,7 +17,8 @@ const state = {
   uploadedRecords: [],
   activeModalStaff: null,
   deptChartInstance: null,
-  distChartInstance: null
+  distChartInstance: null,
+  accountInfo: null
 };
 
 // DOM Elements
@@ -64,7 +65,21 @@ const elements = {
   configModal: document.getElementById('configModal'),
   candidateModal: document.getElementById('candidateModal'),
   candidateModalBody: document.getElementById('candidateModalBody'),
-  candidateModalTitle: document.getElementById('candidateModalTitle')
+  candidateModalTitle: document.getElementById('candidateModalTitle'),
+
+  // Credit / Quota elements
+  creditBadge: document.getElementById('creditBadge'),
+  creditText: document.getElementById('creditText'),
+  creditAlertBanner: document.getElementById('creditAlertBanner'),
+  creditAlertTitle: document.getElementById('creditAlertTitle'),
+  creditAlertDesc: document.getElementById('creditAlertDesc'),
+  creditAlertAction: document.getElementById('creditAlertAction'),
+  modalSearchesLeft: document.getElementById('modalSearchesLeft'),
+  modalPlanName: document.getElementById('modalPlanName'),
+  modalMonthUsage: document.getElementById('modalMonthUsage'),
+  modalAccountEmail: document.getElementById('modalAccountEmail'),
+  modalCreditWarning: document.getElementById('modalCreditWarning'),
+  refreshQuotaBtn: document.getElementById('refreshQuotaBtn')
 };
 
 // Initialize Application
@@ -79,8 +94,8 @@ function setupEventListeners() {
   // Theme toggle
   elements.themeToggleBtn.addEventListener('click', toggleTheme);
 
-  // Settings modal
-  elements.settingsBtn.addEventListener('click', () => openModal(elements.configModal));
+  // Settings modal (also refreshes quota on open)
+  elements.settingsBtn.addEventListener('click', () => onSettingsOpen());
   document.getElementById('saveConfigBtn').addEventListener('click', saveConfiguration);
 
   // Mock toggle
@@ -159,6 +174,24 @@ function setupEventListeners() {
 
   // Manual author ID modal input save
   document.getElementById('manualMatchBtn').addEventListener('click', saveManualMatch);
+
+  // Credit badge opens settings modal
+  elements.creditBadge.addEventListener('click', () => {
+    openModal(elements.configModal);
+    fetchAccountInfo();
+  });
+
+  // Refresh quota button inside modal
+  elements.refreshQuotaBtn.addEventListener('click', fetchAccountInfo);
+
+  // Credit alert action (switch to demo mode)
+  elements.creditAlertAction.addEventListener('click', () => {
+    state.useMock = true;
+    elements.mockToggle.checked = true;
+    updateStatusPill();
+    updateCreditBadge();
+    elements.creditAlertBanner.style.display = 'none';
+  });
 }
 
 // Check Backend Status
@@ -175,6 +208,9 @@ async function checkSystemStatus() {
       elements.mockToggle.checked = true;
     }
     updateStatusPill();
+
+    // Fetch credit / quota info from the free /api/account endpoint
+    await fetchAccountInfo();
   } catch (err) {
     console.error('Failed to connect to backend API:', err);
     elements.statusText.textContent = 'API Offline';
@@ -192,6 +228,124 @@ function updateStatusPill() {
   } else {
     elements.statusText.textContent = 'SerpApi Key Needed (Using Demo)';
   }
+}
+
+// Fetch account / credit quota from the free SerpApi account endpoint
+async function fetchAccountInfo() {
+  try {
+    const mockParam = state.useMock ? '&use_mock=true' : '';
+    const res = await fetch(`/api/account?${mockParam}`);
+    const data = await res.json();
+    state.accountInfo = data;
+    updateCreditBadge();
+    updateModalAccountCard();
+    showCreditAlertBanner();
+  } catch (err) {
+    console.error('Failed to fetch account/credit info:', err);
+    elements.creditText.textContent = 'Credits: N/A';
+  }
+}
+
+// Update topbar credit badge with remaining searches and severity color
+function updateCreditBadge() {
+  const info = state.accountInfo;
+  const badge = elements.creditBadge;
+  badge.className = 'credit-pill';
+
+  if (!info) {
+    elements.creditText.textContent = 'Credits: N/A';
+    return;
+  }
+
+  if (info.is_mock || state.useMock) {
+    badge.classList.add('mock');
+    elements.creditText.textContent = '∞ Demo Mode';
+    return;
+  }
+
+  const status = info.status || 'healthy';
+  const left = info.total_searches_left;
+
+  if (left === null || left === undefined) {
+    elements.creditText.textContent = 'Credits: N/A';
+    return;
+  }
+
+  badge.classList.add(status);
+  elements.creditText.textContent = `${Number(left).toLocaleString()} left`;
+}
+
+// Update the account quota card inside the settings modal
+function updateModalAccountCard() {
+  const info = state.accountInfo;
+  if (!info) return;
+
+  const left = info.total_searches_left;
+  const status = info.status || 'healthy';
+
+  // Remaining searches
+  elements.modalSearchesLeft.textContent = (left !== null && left !== undefined)
+    ? Number(left).toLocaleString()
+    : 'N/A';
+  elements.modalSearchesLeft.className = 'account-item-val highlight';
+  if (['low', 'critical', 'depleted'].includes(status)) {
+    elements.modalSearchesLeft.classList.add(status);
+  }
+
+  // Plan name
+  elements.modalPlanName.textContent = info.plan_name || '—';
+
+  // Monthly usage
+  if (info.searches_per_month && info.this_month_usage !== undefined) {
+    elements.modalMonthUsage.textContent = `${Number(info.this_month_usage).toLocaleString()} / ${Number(info.searches_per_month).toLocaleString()}`;
+  } else {
+    elements.modalMonthUsage.textContent = info.this_month_usage !== undefined
+      ? Number(info.this_month_usage).toLocaleString()
+      : '—';
+  }
+
+  // Account email
+  elements.modalAccountEmail.textContent = info.account_email || '—';
+
+  // Warning text
+  if (info.warning) {
+    elements.modalCreditWarning.textContent = info.warning;
+    elements.modalCreditWarning.className = 'account-card-warning';
+    if (['critical', 'depleted'].includes(status)) {
+      elements.modalCreditWarning.classList.add(status);
+    }
+    elements.modalCreditWarning.style.display = 'block';
+  } else {
+    elements.modalCreditWarning.style.display = 'none';
+  }
+}
+
+// Show or hide the warning banner at the top of the ingestion panel
+function showCreditAlertBanner() {
+  const info = state.accountInfo;
+  if (!info || !info.warning || info.is_mock || state.useMock) {
+    elements.creditAlertBanner.style.display = 'none';
+    return;
+  }
+
+  const status = info.status || '';
+  elements.creditAlertBanner.className = 'credit-alert-banner';
+  if (['critical', 'depleted'].includes(status)) {
+    elements.creditAlertBanner.classList.add(status);
+  }
+
+  if (status === 'depleted') {
+    elements.creditAlertTitle.textContent = '🚫 Credit Balance Depleted';
+    elements.creditAlertDesc.textContent = info.warning;
+  } else if (status === 'critical') {
+    elements.creditAlertTitle.textContent = '🔴 Critically Low Credits';
+    elements.creditAlertDesc.textContent = info.warning;
+  } else {
+    elements.creditAlertTitle.textContent = '⚠️ Low Credit Warning';
+    elements.creditAlertDesc.textContent = info.warning;
+  }
+
+  elements.creditAlertBanner.style.display = 'flex';
 }
 
 // File Upload Handler
@@ -284,6 +438,14 @@ async function startBatchDiscovery() {
     const data = await res.json();
     state.records = data.records;
     state.analytics = data.analytics;
+
+    // Update account/credit info returned after discovery
+    if (data.account) {
+      state.accountInfo = data.account;
+      updateCreditBadge();
+      updateModalAccountCard();
+      showCreditAlertBanner();
+    }
 
     elements.progressFill.style.width = '100%';
     elements.progressPct.textContent = '100%';
@@ -694,6 +856,12 @@ async function saveConfiguration() {
   } catch (err) {
     alert('Failed to save configuration.');
   }
+}
+
+// Settings modal also triggers fresh account fetch when opened
+function onSettingsOpen() {
+  openModal(elements.configModal);
+  fetchAccountInfo();
 }
 
 // Theme Toggle

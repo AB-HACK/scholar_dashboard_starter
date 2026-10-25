@@ -39,13 +39,29 @@
           <span class="status-dot"></span>
           <span id="statusText">Checking status...</span>
         </div>
+        <div id="creditBadge" class="credit-pill" title="SerpApi Remaining Searches (Click to view details)">
+          <span class="credit-icon">⚡</span>
+          <span id="creditText">Credits: —</span>
+        </div>
         <button id="themeToggleBtn" class="btn btn-secondary btn-icon" title="Toggle Theme">☀️</button>
-        <button id="settingsBtn" class="btn btn-secondary btn-icon" title="API Configuration">⚙️</button>
+        <button id="settingsBtn" class="btn btn-secondary btn-icon" title="API Configuration & Quota">⚙️</button>
       </div>
     </header>
 
     <!-- Ingestion & Control Panel -->
     <section class="ingestion-panel">
+      <!-- Low Credit / Quota Warning Banner -->
+      <div id="creditAlertBanner" class="credit-alert-banner" style="display: none;">
+        <div class="alert-icon-box">⚠️</div>
+        <div class="alert-content">
+          <div id="creditAlertTitle" class="alert-title">Low Credit Warning</div>
+          <div id="creditAlertDesc" class="alert-desc">Remaining SerpApi searches are running low.</div>
+        </div>
+        <div class="alert-actions">
+          <button id="creditAlertAction" class="btn btn-warning btn-sm" type="button">Switch to Demo Mode</button>
+        </div>
+      </div>
+
       <div class="panel-header">
         <h2 class="panel-title">
           <span>📂</span> Faculty Roster Ingestion & Discovery Controls
@@ -295,6 +311,33 @@
         <div class="input-group">
           <label class="input-label" for="configInstitution">Default Institution</label>
           <input type="text" id="configInstitution" class="text-input" value="University of Lagos" placeholder="e.g. University of Lagos">
+        </div>
+
+        <!-- Live SerpApi Quota & Account Info Card -->
+        <div class="account-card" id="modalAccountCard">
+          <div class="account-card-header">
+            <span class="account-card-title">💳 SerpApi Account & Quota</span>
+            <button id="refreshQuotaBtn" class="btn btn-secondary btn-xs" type="button" title="Fetch live balance from /account endpoint">🔄 Refresh Balance</button>
+          </div>
+          <div class="account-grid">
+            <div class="account-item">
+              <span class="account-item-label">Remaining Searches</span>
+              <span id="modalSearchesLeft" class="account-item-val highlight">—</span>
+            </div>
+            <div class="account-item">
+              <span class="account-item-label">Plan Tier</span>
+              <span id="modalPlanName" class="account-item-val">—</span>
+            </div>
+            <div class="account-item">
+              <span class="account-item-label">Monthly Usage</span>
+              <span id="modalMonthUsage" class="account-item-val">—</span>
+            </div>
+            <div class="account-item">
+              <span class="account-item-label">Account Email</span>
+              <span id="modalAccountEmail" class="account-item-val">—</span>
+            </div>
+          </div>
+          <div id="modalCreditWarning" class="account-card-warning" style="display: none;"></div>
         </div>
       </div>
       <div class="modal-footer">

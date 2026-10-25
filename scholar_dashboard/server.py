@@ -78,6 +78,14 @@ async def get_system_status():
     }
 
 
+@app.get("/api/account")
+async def get_account_status(api_key: Optional[str] = None, use_mock: bool = False):
+    """Retrieve SerpApi remaining credits, subscription tier, and quota status."""
+    active_key = api_key.strip() if api_key else get_serpapi_key()
+    client = ScholarClient(api_key=active_key)
+    return client.get_account_info(use_mock=use_mock)
+
+
 @app.post("/api/config")
 async def update_config(payload: ConfigPayload):
     if payload.api_key:
@@ -155,6 +163,15 @@ async def run_discovery(payload: DiscoveryPayload):
     if total == 0:
         raise HTTPException(status_code=400, detail="No staff records provided for discovery.")
 
+    if not use_mock and active_key:
+        acc_info = client.get_account_info(use_mock=False)
+        left = acc_info.get("total_searches_left")
+        if left is not None and left <= 0:
+            raise HTTPException(
+                status_code=400,
+                detail="SerpApi credit quota is 0. Live searches cannot be executed. Please enable Demo / Mock Mode or recharge your plan."
+            )
+
     dashboard_state["is_running"] = True
     dashboard_state["progress"] = 0.0
     dashboard_state["current_status"] = f"Starting discovery for {total} staff..."
@@ -224,7 +241,8 @@ async def run_discovery(payload: DiscoveryPayload):
         "status": "success",
         "total": len(results),
         "records": results,
-        "analytics": get_analytics_payload(results)
+        "analytics": get_analytics_payload(results),
+        "account": client.get_account_info(use_mock=use_mock)
     }
 
 
