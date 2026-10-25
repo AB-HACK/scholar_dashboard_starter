@@ -3,6 +3,7 @@ import asyncio
 import io
 import json
 import os
+import time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
@@ -52,6 +53,14 @@ class VerifyPayload(BaseModel):
     profile_name: Optional[str] = None
     affiliation: Optional[str] = None
     status: str = "Verified"
+    use_mock: bool = False
+
+
+class IndividualPayload(BaseModel):
+    name: str
+    department: Optional[str] = ""
+    institution: Optional[str] = ""
+    api_key: Optional[str] = ""
     use_mock: bool = False
 
 
@@ -126,21 +135,22 @@ async def upload_staff_file(file: UploadFile = File(...)):
 async def get_sample_faculty():
     """Provide realistic sample academic department data for immediate testing."""
     sample_records = [
-        {"id": "staff_1", "name": "Prof. Oluwatoyin Temitayo Ogundipe", "department": "Botany", "raw_index": 0},
-        {"id": "staff_2", "name": "Prof. Folasade Tolulope Ogunsola", "department": "Medical Microbiology", "raw_index": 1},
-        {"id": "staff_3", "name": "Prof. Babajide Alo", "department": "Chemistry", "raw_index": 2},
-        {"id": "staff_4", "name": "Prof. Kehinde Olayinka", "department": "Chemistry", "raw_index": 3},
-        {"id": "staff_5", "name": "Dr. Chika Yinka-Banjo", "department": "Computer Sciences", "raw_index": 4},
-        {"id": "staff_6", "name": "Prof. Elijah Ayolabi", "department": "Geosciences", "raw_index": 5},
-        {"id": "staff_7", "name": "Dr. Isaac A. Omoleke", "department": "Public Administration", "raw_index": 6},
-        {"id": "staff_8", "name": "Prof. Lucian Obinna Chukwu", "department": "Marine Sciences", "raw_index": 7},
-        {"id": "staff_9", "name": "Dr. Mary Kehinde Ladapo", "department": "Pharmacology", "raw_index": 8},
-        {"id": "staff_10", "name": "Prof. Sunday Adebisi", "department": "Business Administration", "raw_index": 9},
-        {"id": "staff_11", "name": "Dr. Hakeem Olanrewaju Amuda", "department": "Metallurgical & Materials", "raw_index": 10},
-        {"id": "staff_12", "name": "Dr. Grace O. Babafemi", "department": "Biochemistry", "raw_index": 11}
+        {"id": "staff_0", "name": "Prof. Luqman A. Adams", "department": "Chemistry", "raw_index": 0},
+        {"id": "staff_1", "name": "Prof. Oluwatoyin Temitayo Ogundipe", "department": "Botany", "raw_index": 1},
+        {"id": "staff_2", "name": "Prof. Folasade Tolulope Ogunsola", "department": "Medical Microbiology", "raw_index": 2},
+        {"id": "staff_3", "name": "Prof. Babajide Alo", "department": "Chemistry", "raw_index": 3},
+        {"id": "staff_4", "name": "Prof. Kehinde Olayinka", "department": "Chemistry", "raw_index": 4},
+        {"id": "staff_5", "name": "Dr. Chika Yinka-Banjo", "department": "Computer Sciences", "raw_index": 5},
+        {"id": "staff_6", "name": "Prof. Elijah Ayolabi", "department": "Geosciences", "raw_index": 6},
+        {"id": "staff_7", "name": "Dr. Isaac A. Omoleke", "department": "Public Administration", "raw_index": 7},
+        {"id": "staff_8", "name": "Prof. Lucian Obinna Chukwu", "department": "Marine Sciences", "raw_index": 8},
+        {"id": "staff_9", "name": "Dr. Mary Kehinde Ladapo", "department": "Pharmacology", "raw_index": 9},
+        {"id": "staff_10", "name": "Prof. Sunday Adebisi", "department": "Business Administration", "raw_index": 10},
+        {"id": "staff_11", "name": "Dr. Hakeem Olanrewaju Amuda", "department": "Metallurgical & Materials", "raw_index": 11},
+        {"id": "staff_12", "name": "Dr. Grace O. Babafemi", "department": "Biochemistry", "raw_index": 12}
     ]
     return {
-        "filename": "faculty_sample_chemistry_sciences.xlsx",
+        "filename": "unilag_faculty_sample_chemistry_sciences.xlsx",
         "total_rows": len(sample_records),
         "columns": ["Name", "Department"],
         "detected_name_col": "Name",
@@ -242,6 +252,85 @@ async def run_discovery(payload: DiscoveryPayload):
         "total": len(results),
         "records": results,
         "analytics": get_analytics_payload(results),
+        "account": client.get_account_info(use_mock=use_mock)
+    }
+
+
+@app.post("/api/individual")
+async def add_individual_profile(payload: IndividualPayload):
+    """Search Google Scholar for a single faculty member and add to session roster."""
+    name = payload.name.strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="Staff name is required.")
+
+    active_key = payload.api_key.strip() if payload.api_key else get_serpapi_key()
+    institution = payload.institution.strip() if payload.institution else dashboard_state.get("institution", "University of Lagos")
+    use_mock = payload.use_mock or (not active_key)
+
+    client = ScholarClient(api_key=active_key, enable_cache=True)
+
+    if not use_mock and active_key:
+        acc_info = client.get_account_info(use_mock=False)
+        left = acc_info.get("total_searches_left")
+        if left is not None and left <= 0:
+            raise HTTPException(
+                status_code=400,
+                detail="SerpApi credit quota is 0. Live searches cannot be executed. Please enable Demo / Mock Mode or recharge your plan."
+            )
+
+    staff_id = f"staff_{int(time.time() * 1000)}"
+    dept = payload.department.strip() if payload.department else "General"
+
+    base_res = {
+        "id": staff_id,
+        "staff_name": name,
+        "department": dept,
+        "match_status": "No profile found",
+        "profile_name": "",
+        "affiliation": "",
+        "profile_url": "",
+        "author_id": "",
+        "candidate_count": 0,
+        "candidates": [],
+        "citations_all": 0,
+        "citations_recent": 0,
+        "h_index_all": 0,
+        "h_index_recent": 0,
+        "i10_index_all": 0,
+        "i10_index_recent": 0,
+        "interests": []
+    }
+
+    try:
+        candidates = client.discover_candidates(name, dept, institution, use_mock=use_mock)
+        base_res["candidates"] = candidates
+        base_res["candidate_count"] = len(candidates)
+
+        if candidates:
+            top_cand = candidates[0]
+            aid = top_cand.get("author_id", "")
+            metrics = client.get_metrics(aid, use_mock=use_mock) if aid else {}
+            base_res.update({
+                "match_status": "Needs verification",
+                "profile_name": top_cand.get("name", ""),
+                "affiliation": top_cand.get("affiliations", ""),
+                "profile_url": top_cand.get("profile_url", ""),
+                "author_id": aid,
+                **metrics
+            })
+    except Exception as exc:
+        base_res["match_status"] = f"Error: {str(exc)[:50]}"
+
+    # Prepend to session records so the new faculty is immediately at the top
+    current_records = dashboard_state.get("records", [])
+    dashboard_state["records"] = [base_res] + [r for r in current_records if r["id"] != staff_id]
+
+    return {
+        "status": "success",
+        "record": base_res,
+        "total": len(dashboard_state["records"]),
+        "records": dashboard_state["records"],
+        "analytics": get_analytics_payload(dashboard_state["records"]),
         "account": client.get_account_info(use_mock=use_mock)
     }
 

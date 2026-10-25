@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UniScholar Analytics — Academic Research Impact Dashboard</title>
-  <meta name="description" content="Executive research dashboard for discovering Google Scholar profiles, tracking citations, h-index metrics, and institutional department analytics.">
+  <title>University of Lagos — Google Scholar Metrics Intelligence Portal</title>
+  <meta name="description" content="University of Lagos institutional research analytics dashboard for discovering Google Scholar profiles, tracking citations, h-index metrics, and departmental footprints.">
   
   <!-- Modern Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,13 +24,13 @@
     <!-- Top Navigation Bar -->
     <header class="topbar">
       <div class="brand-wrapper">
-        <div class="brand-icon">📚</div>
+        <div class="brand-icon unilag-crest">🎓</div>
         <div>
           <div class="brand-title">
-            UniScholar Analytics
-            <span class="brand-badge">Executive</span>
+            University of Lagos
+            <span class="brand-badge">Intelligence Portal</span>
           </div>
-          <div class="brand-sub">Institutional Research Impact & Faculty Citation Intelligence</div>
+          <div class="brand-sub">GOOGLE SCHOLAR METRICS INTELLIGENCE PORTAL &bull; Institutional Research Analytics</div>
         </div>
       </div>
 
@@ -47,6 +47,7 @@
         <button id="settingsBtn" class="btn btn-secondary btn-icon" title="API Configuration & Quota">⚙️</button>
       </div>
     </header>
+    <div class="brand-divider"></div>
 
     <!-- Ingestion & Control Panel -->
     <section class="ingestion-panel">
@@ -63,9 +64,14 @@
       </div>
 
       <div class="panel-header">
-        <h2 class="panel-title">
-          <span>📂</span> Faculty Roster Ingestion & Discovery Controls
-        </h2>
+        <div>
+          <h2 class="panel-title">
+            <span>📂</span> Upload Staff Document
+          </h2>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
+            Upload any document containing staff names. The system will automatically extract names and retrieve their Google Scholar metrics.
+          </div>
+        </div>
         <label for="mockToggle" class="switch-wrapper" id="mockToggleWrapper" title="Toggle simulated test mode with zero SerpApi credit usage">
           <input type="checkbox" id="mockToggle" style="display: none;">
           <span class="toggle-switch"></span>
@@ -79,10 +85,10 @@
       <div class="upload-grid">
         <!-- Dropzone -->
         <div id="dropzone" class="dropzone">
-          <input type="file" id="fileInput" accept=".xlsx, .xls, .csv" style="display: none;">
+          <input type="file" id="fileInput" accept=".xlsx, .xls, .csv, .json, .txt" style="display: none;">
           <div class="dropzone-icon">📥</div>
-          <div class="dropzone-title">Drop Faculty Excel (.xlsx, .xls) or CSV here</div>
-          <div class="dropzone-sub">Automatic detection for Staff Name & Department columns</div>
+          <div class="dropzone-title">Drop Faculty Excel, CSV, JSON, or TXT here</div>
+          <div class="dropzone-sub">Supported: JSON, Word (DOCX), PDF, Text (TXT), Excel (XLSX, XLS), CSV</div>
         </div>
 
         <!-- Parameters & Controls -->
@@ -100,13 +106,44 @@
 
         <!-- Action Runner -->
         <div style="display: flex; flex-direction: column; justify-content: center; gap: 12px;">
-          <button id="runBtn" class="btn btn-primary" style="height: 52px; font-size: 15px;" disabled>
-            🚀 Run Discovery & Citation Analysis
+          <button id="runBtn" class="btn btn-primary btn-crawler" style="height: 52px; font-size: 15px;" disabled>
+            ▷ Start Scholar Crawler
           </button>
           <div id="uploadInfo" style="display: none; font-size: 12px; color: var(--accent-primary); text-align: center;">
             <span id="uploadInfoText"></span>
           </div>
         </div>
+      </div>
+
+      <!-- Add Individual Profile Section -->
+      <div class="individual-card">
+        <div class="individual-header">
+          <div class="individual-title">
+            <span class="individual-icon">👤</span>
+            <div>
+              <div style="font-weight: 700; color: var(--text-main); font-size: 14px;">+ Add Individual Profile</div>
+              <div style="font-size: 12px; color: var(--text-muted);">Search for one person at a time. Results accumulate in your live session roster.</div>
+            </div>
+          </div>
+        </div>
+        <form id="individualForm" class="individual-form" onsubmit="event.preventDefault(); handleAddIndividual();">
+          <div class="individual-input-row">
+            <div class="input-group" style="flex: 2;">
+              <label class="input-label" for="indivNameInput">Staff Name</label>
+              <input type="text" id="indivNameInput" class="text-input" placeholder="e.g. Prof. Luqman A. Adams" required>
+            </div>
+            <div class="input-group" style="flex: 1.5;">
+              <label class="input-label" for="indivDeptInput">Department (Optional)</label>
+              <input type="text" id="indivDeptInput" class="text-input" placeholder="e.g. Chemistry">
+            </div>
+            <div style="display: flex; align-items: flex-end;">
+              <button type="submit" id="indivSubmitBtn" class="btn btn-crawler" style="height: 42px; white-space: nowrap; padding: 0 18px;">
+                ▷ Search & Add Profile
+              </button>
+            </div>
+          </div>
+          <div id="indivFeedback" class="individual-feedback" style="display: none;"></div>
+        </form>
       </div>
 
       <!-- Batch Execution Progress Drawer -->
@@ -203,14 +240,14 @@
     <section class="table-panel">
       <div class="table-toolbar">
         <div>
-          <h3 class="panel-title">📋 Faculty Citation Roster & Disambiguation Review</h3>
+          <h3 class="panel-title">📊 Extraction Results</h3>
           <div id="tableCountLabel" style="font-size: 12px; color: var(--text-muted);">Showing 0 faculty</div>
         </div>
 
         <div class="table-filters">
           <div class="search-input-wrapper">
             <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" class="text-input" placeholder="Search faculty or affiliation...">
+            <input type="text" id="searchInput" class="text-input" placeholder="Search faculty or department...">
           </div>
 
           <select id="deptFilterSelect" class="text-input" style="width: auto;">
@@ -225,11 +262,11 @@
           </div>
 
           <div style="display: flex; gap: 8px;">
+            <button id="exportCsvBtn" class="btn btn-success" disabled title="Download Official CSV Report">
+              📥 Download CSV Report
+            </button>
             <button id="exportExcelBtn" class="btn btn-secondary btn-sm" disabled title="Download formatted multi-sheet Excel">
               📊 Export Excel
-            </button>
-            <button id="exportCsvBtn" class="btn btn-secondary btn-sm" disabled title="Download CSV">
-              📄 Export CSV
             </button>
           </div>
         </div>
@@ -239,21 +276,23 @@
         <table class="custom-table">
           <thead>
             <tr>
-              <th style="width: 130px;">Verification</th>
-              <th>Faculty Name</th>
-              <th>Discovered Scholar Profile</th>
-              <th>Citations</th>
-              <th>h-Index</th>
-              <th>i10-Index</th>
-              <th style="width: 140px;">Actions</th>
+              <th style="min-width: 170px;">STAFF NAME</th>
+              <th style="min-width: 130px;">DEPARTMENT</th>
+              <th style="text-align: right; min-width: 110px;">CITATIONS (ALL)</th>
+              <th style="text-align: right; min-width: 120px;">CITATIONS (2021+)</th>
+              <th style="text-align: right; min-width: 95px;">H-INDEX (ALL)</th>
+              <th style="text-align: right; min-width: 105px;">H-INDEX (2021+)</th>
+              <th style="text-align: right; min-width: 95px;">I10-INDEX (ALL)</th>
+              <th style="text-align: right; min-width: 105px;">I10-INDEX (2021+)</th>
+              <th style="text-align: center; min-width: 160px;">ACTIONS & VERIFICATION</th>
             </tr>
           </thead>
           <tbody id="rosterTableBody">
             <tr>
-              <td colspan="7">
+              <td colspan="9">
                 <div class="empty-state">
                   <span class="empty-icon">📄</span>
-                  <p>Upload a staff spreadsheet or click "Load Sample Roster" to view metrics.</p>
+                  <p>Upload a staff document or click "Load Sample Roster" to view metrics.</p>
                 </div>
               </td>
             </tr>

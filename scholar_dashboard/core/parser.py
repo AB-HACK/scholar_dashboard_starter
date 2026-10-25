@@ -28,6 +28,32 @@ def read_staff_dataframe(file_source: Any, filename: str) -> pd.DataFrame:
         df = pd.read_excel(buffer, engine="openpyxl")
     elif lower_name.endswith(".xls"):
         df = pd.read_excel(buffer, engine="xlrd")
+    elif lower_name.endswith(".json"):
+        import json
+        raw = buffer.getvalue() if hasattr(buffer, "getvalue") else buffer.read()
+        content_str = raw.decode("utf-8", errors="ignore") if isinstance(raw, bytes) else str(raw)
+        data = json.loads(content_str)
+        if isinstance(data, list):
+            df = pd.DataFrame(data)
+        elif isinstance(data, dict):
+            for k in ["staff", "records", "faculty", "data", "members"]:
+                if k in data and isinstance(data[k], list):
+                    df = pd.DataFrame(data[k])
+                    break
+            else:
+                df = pd.DataFrame([data])
+        else:
+            df = pd.DataFrame()
+    elif lower_name.endswith(".txt"):
+        raw = buffer.getvalue() if hasattr(buffer, "getvalue") else buffer.read()
+        content_str = raw.decode("utf-8", errors="ignore") if isinstance(raw, bytes) else str(raw)
+        lines = [line.strip() for line in content_str.splitlines() if line.strip()]
+        if lines and ("\t" in lines[0] or "," in lines[0]):
+            if hasattr(buffer, "seek"):
+                buffer.seek(0)
+            df = pd.read_csv(buffer, sep=None, engine="python")
+        else:
+            df = pd.DataFrame({"Name": lines})
     else:
         # Fallback trial
         try:

@@ -10,20 +10,20 @@ from openpyxl.utils import get_column_letter
 def export_to_csv(records: List[Dict[str, Any]]) -> bytes:
     """Generate UTF-8-SIG encoded CSV for Excel compatibility."""
     df = pd.DataFrame(records)
-    # Re-order and rename columns for clarity
+    # Re-order and rename columns to match the official Intelligence Portal report format
     rename_map = {
-        "staff_name": "Staff Name",
-        "department": "Department",
-        "match_status": "Status",
-        "profile_name": "Scholar Profile Name",
-        "affiliation": "Affiliation",
-        "citations_all": "Citations (All)",
-        "citations_recent": "Citations (Recent)",
-        "h_index_all": "h-index (All)",
-        "h_index_recent": "h-index (Recent)",
-        "i10_index_all": "i10-index (All)",
-        "i10_index_recent": "i10-index (Recent)",
-        "profile_url": "Profile URL"
+        "staff_name": "STAFF NAME",
+        "department": "DEPARTMENT",
+        "citations_all": "CITATIONS (ALL)",
+        "citations_recent": "CITATIONS (2021+)",
+        "h_index_all": "H-INDEX (ALL)",
+        "h_index_recent": "H-INDEX (2021+)",
+        "i10_index_all": "I10-INDEX (ALL)",
+        "i10_index_recent": "I10-INDEX (2021+)",
+        "match_status": "STATUS",
+        "profile_name": "SCHOLAR PROFILE NAME",
+        "affiliation": "AFFILIATION",
+        "profile_url": "PROFILE URL"
     }
     cols = [c for c in rename_map.keys() if c in df.columns]
     out_df = df[cols].rename(columns=rename_map)

@@ -79,7 +79,14 @@ const elements = {
   modalMonthUsage: document.getElementById('modalMonthUsage'),
   modalAccountEmail: document.getElementById('modalAccountEmail'),
   modalCreditWarning: document.getElementById('modalCreditWarning'),
-  refreshQuotaBtn: document.getElementById('refreshQuotaBtn')
+  refreshQuotaBtn: document.getElementById('refreshQuotaBtn'),
+
+  // Individual profile search
+  indivNameInput: document.getElementById('indivNameInput'),
+  indivDeptInput: document.getElementById('indivDeptInput'),
+  indivSubmitBtn: document.getElementById('indivSubmitBtn'),
+  indivFeedback: document.getElementById('indivFeedback'),
+  individualForm: document.getElementById('individualForm')
 };
 
 // Initialize Application
@@ -650,7 +657,7 @@ function renderTable() {
   if (filtered.length === 0) {
     elements.tableBody.innerHTML = `
       <tr>
-        <td colspan="7">
+        <td colspan="9">
           <div class="empty-state">
             <span class="empty-icon">🔍</span>
             <p>No matching faculty records found.</p>
@@ -675,36 +682,38 @@ function renderTable() {
 
     tr.innerHTML = `
       <td>
-        <span class="badge ${badgeClass}" style="cursor: pointer" onclick="toggleVerifyStatus('${row.id}')" title="Click to toggle status">
-          ${statusText === 'Verified' ? '✓ Verified' : (statusText === 'Needs verification' ? '⚠ Needs Review' : '✕ Unmatched')}
-        </span>
+        <div style="font-weight: 700; color: var(--text-main); font-size: 14px;">${escapeHtml(row.staff_name)}</div>
+        ${row.profile_name && row.profile_name !== row.staff_name ? `<div style="font-size: 11px; color: var(--text-muted); font-weight: 500;">Scholar: ${escapeHtml(row.profile_name)}</div>` : ''}
+        ${row.affiliation ? `<div style="font-size: 11px; color: var(--text-faint); max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(row.affiliation)}">${escapeHtml(row.affiliation)}</div>` : ''}
       </td>
       <td>
-        <div style="font-weight: 600;">${escapeHtml(row.staff_name)}</div>
-        <div style="font-size: 11px; color: var(--text-faint);">${escapeHtml(row.department || 'N/A')}</div>
+        <span class="dept-badge">${escapeHtml(row.department || 'General')}</span>
       </td>
-      <td>
-        ${row.profile_name ? `
-          <div>${escapeHtml(row.profile_name)}</div>
-          <div style="font-size: 11px; color: var(--text-muted); max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-            ${escapeHtml(row.affiliation || '')}
-          </div>
-        ` : '<span style="color: var(--text-faint);">—</span>'}
+      <td style="text-align: right; font-weight: 700; color: var(--text-main); font-size: 14px;">
+        ${(row.citations_all || 0).toLocaleString()}
       </td>
-      <td>
-        <div style="font-weight: 700;">${(row.citations_all || 0).toLocaleString()}</div>
-        <div style="font-size: 11px; color: var(--text-muted);">Recent: ${(row.citations_recent || 0).toLocaleString()}</div>
+      <td style="text-align: right; font-weight: 600; color: var(--accent-primary); font-size: 14px;">
+        ${(row.citations_recent || 0).toLocaleString()}
       </td>
-      <td>
-        <div style="font-weight: 700;">${row.h_index_all || 0}</div>
+      <td style="text-align: right; font-weight: 700; color: var(--text-main); font-size: 14px;">
+        ${row.h_index_all || 0}
       </td>
-      <td>
-        <div style="font-weight: 700;">${row.i10_index_all || 0}</div>
+      <td style="text-align: right; font-weight: 600; color: var(--accent-warning); font-size: 14px;">
+        ${row.h_index_recent || 0}
       </td>
-      <td>
-        <div style="display: flex; gap: 6px;">
-          ${row.profile_url ? `<a href="${row.profile_url}" target="_blank" class="btn btn-secondary btn-sm" title="Open Google Scholar">🔗</a>` : ''}
-          <button class="btn btn-secondary btn-sm" onclick="openDisambiguationModal('${row.id}')" title="Review candidate profiles">
+      <td style="text-align: right; font-weight: 700; color: var(--text-main); font-size: 14px;">
+        ${row.i10_index_all || 0}
+      </td>
+      <td style="text-align: right; font-weight: 600; color: var(--accent-purple); font-size: 14px;">
+        ${row.i10_index_recent || 0}
+      </td>
+      <td style="text-align: center;">
+        <div style="display: flex; gap: 6px; justify-content: center; align-items: center; flex-wrap: wrap;">
+          <span class="badge ${badgeClass}" style="cursor: pointer" onclick="toggleVerifyStatus('${row.id}')" title="Click to toggle status">
+            ${statusText === 'Verified' ? '✓ Verified' : (statusText === 'Needs verification' ? '⚠ Review' : '✕ Unmatched')}
+          </span>
+          ${row.profile_url ? `<a href="${row.profile_url}" target="_blank" class="btn btn-secondary btn-xs" title="Open Google Scholar">🔗</a>` : ''}
+          <button class="btn btn-secondary btn-xs" onclick="openDisambiguationModal('${row.id}')" title="Review candidate profiles">
             Review (${row.candidate_count || (row.candidates ? row.candidates.length : 0)})
           </button>
         </div>
@@ -713,6 +722,92 @@ function renderTable() {
     elements.tableBody.appendChild(tr);
   });
 }
+
+// Add Individual Faculty Profile Handler
+window.handleAddIndividual = async function() {
+  if (!elements.indivNameInput) return;
+  const name = elements.indivNameInput.value.trim();
+  const dept = elements.indivDeptInput ? elements.indivDeptInput.value.trim() : '';
+  if (!name) return;
+
+  elements.indivSubmitBtn.disabled = true;
+  const originalText = elements.indivSubmitBtn.textContent;
+  elements.indivSubmitBtn.textContent = '⏳ Searching...';
+
+  if (elements.indivFeedback) {
+    elements.indivFeedback.style.display = 'block';
+    elements.indivFeedback.className = 'individual-feedback info';
+    elements.indivFeedback.textContent = `Searching Google Scholar profile for ${name}...`;
+  }
+
+  try {
+    const res = await fetch('/api/individual', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: name,
+        department: dept,
+        institution: elements.institutionInput.value.trim(),
+        use_mock: state.useMock
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.detail || 'Failed to search individual profile');
+    }
+
+    const data = await res.json();
+    const newRec = data.record;
+
+    // Insert into state.records at top if not present, or replace
+    const existingIdx = state.records.findIndex(r => r.id === newRec.id || (r.staff_name && r.staff_name.toLowerCase() === newRec.staff_name.toLowerCase()));
+    if (existingIdx >= 0) {
+      state.records[existingIdx] = newRec;
+    } else {
+      state.records.unshift(newRec);
+    }
+
+    state.analytics = data.analytics;
+    if (data.account) {
+      state.accountInfo = data.account;
+      updateCreditBadge();
+      updateModalAccountCard();
+      showCreditAlertBanner();
+    }
+
+    // Refresh all UI widgets
+    elements.exportExcelBtn.disabled = false;
+    elements.exportCsvBtn.disabled = false;
+    updateKPIs();
+    renderCharts();
+    renderLeaderboard();
+    populateDepartmentFilter();
+    renderTable();
+
+    // Positive feedback
+    if (elements.indivFeedback) {
+      elements.indivFeedback.className = 'individual-feedback success';
+      elements.indivFeedback.textContent = `✓ Successfully added ${newRec.staff_name} (${(newRec.citations_all || 0).toLocaleString()} Citations, h-index ${newRec.h_index_all || 0})`;
+    }
+    elements.indivNameInput.value = '';
+    if (elements.indivDeptInput) elements.indivDeptInput.value = '';
+
+    setTimeout(() => {
+      if (elements.indivFeedback) elements.indivFeedback.style.display = 'none';
+    }, 5000);
+
+  } catch (err) {
+    console.error('Error adding individual profile:', err);
+    if (elements.indivFeedback) {
+      elements.indivFeedback.className = 'individual-feedback error';
+      elements.indivFeedback.textContent = `❌ ${err.message}`;
+    }
+  } finally {
+    elements.indivSubmitBtn.disabled = false;
+    elements.indivSubmitBtn.textContent = originalText;
+  }
+};
 
 // Toggle Verification Status
 window.toggleVerifyStatus = async function(staffId) {
