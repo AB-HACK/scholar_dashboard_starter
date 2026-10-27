@@ -938,25 +938,6 @@ window.handleAddIndividual = async function() {
     elements.indivSubmitBtn.textContent = originalText;
   }
 };
-    }
-    elements.indivNameInput.value = '';
-    if (elements.indivDeptInput) elements.indivDeptInput.value = '';
-
-    setTimeout(() => {
-      if (elements.indivFeedback) elements.indivFeedback.style.display = 'none';
-    }, 5000);
-
-  } catch (err) {
-    console.error('Error adding individual profile:', err);
-    if (elements.indivFeedback) {
-      elements.indivFeedback.className = 'individual-feedback error';
-      elements.indivFeedback.textContent = `❌ ${err.message}`;
-    }
-  } finally {
-    elements.indivSubmitBtn.disabled = false;
-    elements.indivSubmitBtn.textContent = originalText;
-  }
-};
 
 // Toggle Verification Status
 window.toggleVerifyStatus = async function(staffId) {
