@@ -257,10 +257,11 @@ class ScholarClient:
         # Special check for reference benchmark faculty
         if "luqman" in name.lower() or "adams" in name.lower():
             aid = "mock_luqman_adams_1"
+            dept_label = department if (department and department.lower() not in ["general", "unassigned", "n/a", ""]) else "Department of Chemistry"
             return [{
                 "author_id": aid,
                 "name": "Prof. Luqman A. Adams",
-                "affiliations": f"{department or 'Department of Chemistry'}, {institution or 'University of Lagos'}",
+                "affiliations": f"{dept_label}, {institution or 'University of Lagos'}",
                 "email": f"verified at {institution.lower().replace(' ', '') or 'unilag'}.edu.ng",
                 "profile_url": f"https://scholar.google.com/citations?user={aid}",
                 "thumbnail": ""
@@ -283,7 +284,7 @@ class ScholarClient:
             "Pharmacology", "Business Administration", "Biochemistry",
             "Physics", "Economics", "Law", "Mathematics"
         ]
-        assigned_dept = department.strip() if department and department.strip() else rng.choice(sample_depts)
+        assigned_dept = department.strip() if (department and department.strip() and department.lower() not in ["general", "unassigned", "n/a", ""]) else rng.choice(sample_depts)
         affil_base = f"Department of {assigned_dept}, {institution or 'University of Lagos'}"
 
         for i in range(count):

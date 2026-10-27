@@ -287,12 +287,12 @@ async def add_individual_profile(payload: IndividualPayload):
             )
 
     staff_id = f"staff_{int(time.time() * 1000)}"
-    dept = payload.department.strip() if payload.department else "General"
+    dept = payload.department.strip() if payload.department and payload.department.strip() else ""
 
     base_res = {
         "id": staff_id,
         "staff_name": name,
-        "department": dept,
+        "department": dept or "General",
         "match_status": "No profile found",
         "profile_name": "",
         "affiliation": "",
