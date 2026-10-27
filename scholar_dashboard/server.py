@@ -338,9 +338,12 @@ async def add_individual_profile(payload: IndividualPayload):
     except Exception as exc:
         base_res["match_status"] = f"Error: {str(exc)[:50]}"
 
-    # Prepend to session records so the new faculty is immediately at the top
+    # Prepend to session records and deduplicate identical lecturer names
+    from core.parser import normalize_name_key
+    target_key = normalize_name_key(name)
     current_records = dashboard_state.get("records", [])
-    dashboard_state["records"] = [base_res] + [r for r in current_records if r["id"] != staff_id]
+    filtered_existing = [r for r in current_records if r["id"] != staff_id and normalize_name_key(r.get("staff_name", "")) != target_key]
+    dashboard_state["records"] = [base_res] + filtered_existing
 
     return {
         "status": "success",

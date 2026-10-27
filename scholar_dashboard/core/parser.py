@@ -88,17 +88,52 @@ def detect_columns(columns: List[str]) -> Tuple[Optional[str], Optional[str]]:
     return name_col, dept_col
 
 
+def normalize_name_key(name: str) -> str:
+    """Normalize a lecturer name for accurate deduplication comparison."""
+    if not name or not isinstance(name, str):
+        return ""
+    import re
+    # Remove common titles like Prof., Dr., Mr., Mrs., Engr.
+    cleaned = re.sub(r"^(?:prof(?:essor)?\.?|dr\.?|mr\.?|mrs\.?|ms\.?|engr\.?|assoc\.?\s+prof\.?)\s+", "", name.strip(), flags=re.IGNORECASE)
+    cleaned = re.sub(r"[^\w\s]", "", cleaned)
+    return " ".join(cleaned.lower().split())
+
+
+def normalize_department_name(dept: str) -> str:
+    """Normalize department names so variants like 'Dept of Chemistry' collapse to 'Chemistry'."""
+    if not dept or not isinstance(dept, str):
+        return ""
+    import re
+    cleaned = dept.strip()
+    if cleaned.lower() in ["nan", "none", "n/a", "null"]:
+        return ""
+    # Strip leading "Department of", "Dept. of", "Dept of", "Faculty of"
+    cleaned = re.sub(r"^(?:department|dept\.?|faculty)\s+of\s+", "", cleaned, flags=re.IGNORECASE).strip()
+    return cleaned.title() if (cleaned.islower() or cleaned.isupper()) else cleaned
+
+
 def extract_staff_records(df: pd.DataFrame, name_col: str, dept_col: Optional[str] = None) -> List[Dict[str, str]]:
-    """Extract clean staff records ready for discovery."""
+    """Extract clean, deduplicated staff records ready for discovery."""
     records = []
+    seen_names = {}  # normalized_name -> index in records
+
     for idx, row in df.iterrows():
         val = row.get(name_col)
         if pd.isna(val) or not str(val).strip():
             continue
         name_str = str(val).strip()
-        dept_str = str(row.get(dept_col, "")).strip() if dept_col and pd.notna(row.get(dept_col)) else ""
-        if dept_str.lower() == "nan":
-            dept_str = ""
+        raw_dept = str(row.get(dept_col, "")).strip() if dept_col and pd.notna(row.get(dept_col)) else ""
+        dept_str = normalize_department_name(raw_dept)
+
+        norm_key = normalize_name_key(name_str)
+        if norm_key in seen_names:
+            # If earlier entry had no department but duplicate entry does, update it
+            existing_idx = seen_names[norm_key]
+            if not records[existing_idx]["department"] and dept_str:
+                records[existing_idx]["department"] = dept_str
+            continue
+
+        seen_names[norm_key] = len(records)
         records.append({
             "id": f"staff_{idx + 1}",
             "name": name_str,

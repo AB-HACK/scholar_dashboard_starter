@@ -63,15 +63,16 @@ def export_to_excel(
 
     # KPI Table
     kpi_rows = [
-        ("Total Faculty Ingested", kpis.get("total_staff", 0)),
+        ("Total Lecturers Ingested", kpis.get("total_staff", 0)),
+        ("Distinct Departments Covered", kpis.get("unique_departments", 1)),
         ("Google Scholar Profiles Matched", kpis.get("matched_count", 0)),
         ("Match Success Rate", f"{kpis.get('match_rate', 0)}%"),
         ("Verified Profiles", kpis.get("verified_count", 0)),
         ("Needs Verification / Review", kpis.get("needs_verification_count", 0)),
         ("Total Citations (All-Time)", kpis.get("total_citations_all", 0)),
         ("Recent Citations (Recent)", kpis.get("total_citations_recent", 0)),
-        ("Average Faculty h-index", kpis.get("avg_h_index", 0.0)),
-        ("Maximum Faculty h-index", kpis.get("max_h_index", 0)),
+        ("Average Lecturer h-index", kpis.get("avg_h_index", 0.0)),
+        ("Maximum Lecturer h-index", kpis.get("max_h_index", 0)),
         ("Average i10-index", kpis.get("avg_i10_index", 0.0))
     ]
 

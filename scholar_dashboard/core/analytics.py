@@ -32,8 +32,16 @@ def compute_kpis(records: List[Dict[str, Any]]) -> Dict[str, Any]:
     i10_indices = pd.to_numeric(matched.get("i10_index_all", 0), errors="coerce").fillna(0)
 
     matched_count = len(matched)
+    valid_depts = set(
+        str(r.get("department", "")).strip()
+        for r in records
+        if str(r.get("department", "")).strip() and str(r.get("department", "")).strip().lower() not in ["unassigned", "n/a"]
+    )
+    unique_depts_count = len(valid_depts) if valid_depts else (1 if records else 0)
+
     return {
         "total_staff": total_staff,
+        "unique_departments": unique_depts_count,
         "matched_count": matched_count,
         "match_rate": round((matched_count / total_staff) * 100, 1) if total_staff else 0.0,
         "verified_count": len(verified),
@@ -52,10 +60,11 @@ def compute_department_breakdown(records: List[Dict[str, Any]]) -> List[Dict[str
     if not records:
         return []
 
+    from core.parser import normalize_department_name
     df = pd.DataFrame(records)
     if "department" not in df.columns:
         df["department"] = "Unassigned"
-    df["department"] = df["department"].fillna("Unassigned").replace("", "Unassigned")
+    df["department"] = df["department"].fillna("").astype(str).apply(normalize_department_name).replace("", "Unassigned")
 
     departments = []
     for dept_name, group in df.groupby("department"):

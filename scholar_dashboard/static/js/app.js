@@ -48,6 +48,7 @@ const elements = {
   
   // KPIs
   kpiTotalStaff: document.getElementById('kpiTotalStaff'),
+  kpiDeptFootprint: document.getElementById('kpiDeptFootprint'),
   kpiMatchRate: document.getElementById('kpiMatchRate'),
   kpiTotalCitations: document.getElementById('kpiTotalCitations'),
   kpiAvgHIndex: document.getElementById('kpiAvgHIndex'),
@@ -538,6 +539,12 @@ function renderAll() {
 function renderKPIs() {
   const kpis = state.analytics?.kpis || {};
   elements.kpiTotalStaff.textContent = kpis.total_staff || 0;
+  if (elements.kpiDeptFootprint) {
+    const rawDepts = state.records.map(r => (r.department || '').trim()).filter(d => d && d.toLowerCase() !== 'unassigned');
+    const distinctCount = kpis.unique_departments !== undefined ? kpis.unique_departments : (new Set(rawDepts).size || (state.records.length ? 1 : 0));
+    const deptSuffix = distinctCount === 1 ? 'Across 1 Department' : `Across ${distinctCount} Distinct Departments`;
+    elements.kpiDeptFootprint.textContent = state.records.length === 0 ? 'Across 0 departments' : deptSuffix;
+  }
   elements.kpiMatchRate.textContent = `${kpis.match_rate || 0}%`;
   elements.kpiTotalCitations.textContent = (kpis.total_citations_all || 0).toLocaleString();
   elements.kpiAvgHIndex.textContent = kpis.avg_h_index || '0.0';
@@ -729,14 +736,14 @@ function renderTable() {
   elements.tableBody.innerHTML = '';
 
   if (totalItems === 0) {
-    elements.tableCountLabel.textContent = `Showing 0 faculty`;
+    elements.tableCountLabel.textContent = `Showing 0 lecturers`;
     if (elements.paginationContainer) elements.paginationContainer.style.display = 'none';
     elements.tableBody.innerHTML = `
       <tr>
         <td colspan="9">
           <div class="empty-state">
             <span class="empty-icon">🔍</span>
-            <p>No matching faculty records found.</p>
+            <p>No matching lecturer records found.</p>
           </div>
         </td>
       </tr>
@@ -747,12 +754,12 @@ function renderTable() {
 
   // Update table count & pagination bar
   const isFiltered = totalItems !== state.records.length;
-  elements.tableCountLabel.textContent = `Showing ${startIdx + 1}–${endIdx} of ${totalItems} faculty${isFiltered ? ` (${state.records.length} total)` : ''}`;
+  elements.tableCountLabel.textContent = `Showing ${startIdx + 1}–${endIdx} of ${totalItems} lecturers${isFiltered ? ` (${state.records.length} total)` : ''}`;
 
   if (elements.paginationContainer) {
     elements.paginationContainer.style.display = totalItems > pageSize ? 'flex' : 'none';
     if (elements.paginationInfo) {
-      elements.paginationInfo.textContent = `Showing ${startIdx + 1}–${endIdx} of ${totalItems} faculty (Page ${state.pagination.currentPage} of ${totalPages})`;
+      elements.paginationInfo.textContent = `Showing ${startIdx + 1}–${endIdx} of ${totalItems} lecturers (Page ${state.pagination.currentPage} of ${totalPages})`;
     }
     if (elements.prevPageBtn) elements.prevPageBtn.disabled = (state.pagination.currentPage === 1);
     if (elements.nextPageBtn) elements.nextPageBtn.disabled = (state.pagination.currentPage === totalPages);
@@ -837,7 +844,7 @@ function checkMilestoneBanner() {
   const total = state.records.length;
   if (total >= 30 && !state.milestoneBannerDismissed) {
     if (elements.milestoneBannerText) {
-      elements.milestoneBannerText.textContent = `You have accumulated ${total} faculty profiles in this session. We recommend downloading your report (CSV / Excel) to safeguard your data before proceeding.`;
+      elements.milestoneBannerText.textContent = `You have accumulated ${total} lecturer profiles in this session. We recommend downloading your report (CSV / Excel) to safeguard your data before proceeding.`;
     }
     elements.milestoneBanner.style.display = 'flex';
   } else {
@@ -889,12 +896,30 @@ window.handleAddIndividual = async function() {
     const data = await res.json();
     const newRec = data.record;
 
-    // Insert into state.records at top if not present, or replace
-    const existingIdx = state.records.findIndex(r => r.id === newRec.id || (r.staff_name && r.staff_name.toLowerCase() === newRec.staff_name.toLowerCase()));
-    if (existingIdx >= 0) {
-      state.records[existingIdx] = newRec;
+    // Normalize academic titles and punctuation to prevent duplicate lecturer entries
+    const normalizeName = (name) => {
+      if (!name) return '';
+      return name
+        .replace(/^(prof(essor|\.)?|dr\.|doctor|assoc(iate|\.)?\s*prof(essor|\.)?|engr\.|mr\.|mrs\.|ms\.)\s+/i, '')
+        .replace(/[^\w\s]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .toLowerCase();
+    };
+
+    if (data.records && Array.isArray(data.records) && data.records.length > 0) {
+      state.records = data.records;
     } else {
-      state.records.unshift(newRec);
+      const newNorm = normalizeName(newRec.staff_name);
+      const existingIdx = state.records.findIndex(r => 
+        r.id === newRec.id || 
+        (r.staff_name && normalizeName(r.staff_name) === newNorm)
+      );
+      if (existingIdx >= 0) {
+        state.records[existingIdx] = newRec;
+      } else {
+        state.records.unshift(newRec);
+      }
     }
 
     state.analytics = data.analytics;
