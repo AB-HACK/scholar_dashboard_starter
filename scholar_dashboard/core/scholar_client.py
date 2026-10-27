@@ -276,12 +276,20 @@ class ScholarClient:
 
         count = 1 if rng.random() > 0.4 else (2 if rng.random() > 0.3 else 3)
         candidates = []
-        affil_base = f"{department or 'Department of Science'}, {institution or 'University'}"
+        
+        sample_depts = [
+            "Chemistry", "Computer Sciences", "Botany", "Medical Microbiology",
+            "Geosciences", "Public Administration", "Marine Sciences",
+            "Pharmacology", "Business Administration", "Biochemistry",
+            "Physics", "Economics", "Law", "Mathematics"
+        ]
+        assigned_dept = department.strip() if department and department.strip() else rng.choice(sample_depts)
+        affil_base = f"Department of {assigned_dept}, {institution or 'University of Lagos'}"
 
         for i in range(count):
             aid = f"mock_{seed}_{i+1}"
             cand_name = name if i == 0 else f"{name} ({['Jr.', 'Ph.D', 'Univ'][i-1]})"
-            affil = affil_base if i == 0 else f"{department or 'Faculty of Science'}, Regional Institute"
+            affil = affil_base if i == 0 else f"Faculty of {assigned_dept}, Regional Institute"
             candidates.append({
                 "author_id": aid,
                 "name": cand_name,

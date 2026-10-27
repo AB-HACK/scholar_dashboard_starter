@@ -13,7 +13,7 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from core.config import get_serpapi_key, save_serpapi_key
-from core.parser import detect_columns, extract_staff_records, read_staff_dataframe
+from core.parser import detect_columns, extract_department_from_affiliation, extract_staff_records, read_staff_dataframe
 from core.scholar_client import ScholarClient
 from core.analytics import compute_department_breakdown, compute_distribution, compute_kpis, compute_leaderboard
 from core.exporter import export_to_csv, export_to_excel
@@ -226,11 +226,19 @@ async def run_discovery(payload: DiscoveryPayload):
                 top_cand = candidates[0]
                 aid = top_cand.get("author_id", "")
                 metrics = client.get_metrics(aid, use_mock=use_mock) if aid else {}
+                affil = top_cand.get("affiliations", "")
+
+                # Infer department from profile affiliation if missing or generic
+                if (not dept or dept.lower() in ["general", "unassigned", "n/a", ""]) and affil:
+                    inferred_dept = extract_department_from_affiliation(affil)
+                    if inferred_dept:
+                        dept = inferred_dept
+                        base_res["department"] = dept
 
                 base_res.update({
                     "match_status": "Needs verification",
                     "profile_name": top_cand.get("name", ""),
-                    "affiliation": top_cand.get("affiliations", ""),
+                    "affiliation": affil,
                     "profile_url": top_cand.get("profile_url", ""),
                     "author_id": aid,
                     **metrics
@@ -310,10 +318,19 @@ async def add_individual_profile(payload: IndividualPayload):
             top_cand = candidates[0]
             aid = top_cand.get("author_id", "")
             metrics = client.get_metrics(aid, use_mock=use_mock) if aid else {}
+            affil = top_cand.get("affiliations", "")
+
+            # Infer department if user left it blank
+            if (not dept or dept.lower() in ["general", "unassigned", "n/a", ""]) and affil:
+                inferred_dept = extract_department_from_affiliation(affil)
+                if inferred_dept:
+                    dept = inferred_dept
+                    base_res["department"] = dept
+
             base_res.update({
                 "match_status": "Needs verification",
                 "profile_name": top_cand.get("name", ""),
-                "affiliation": top_cand.get("affiliations", ""),
+                "affiliation": affil,
                 "profile_url": top_cand.get("profile_url", ""),
                 "author_id": aid,
                 **metrics

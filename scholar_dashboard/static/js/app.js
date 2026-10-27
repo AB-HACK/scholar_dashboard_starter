@@ -11,6 +11,11 @@ const state = {
     department: 'all',
     search: ''
   },
+  pagination: {
+    currentPage: 1,
+    pageSize: 10
+  },
+  milestoneBannerDismissed: false,
   institution: 'University of Lagos',
   useMock: false,
   hasApiKey: false,
@@ -20,6 +25,9 @@ const state = {
   distChartInstance: null,
   accountInfo: null
 };
+
+// Safe alias to prevent any undefined function reference
+const updateKPIs = () => renderKPIs();
 
 // DOM Elements
 const elements = {
@@ -86,7 +94,21 @@ const elements = {
   indivDeptInput: document.getElementById('indivDeptInput'),
   indivSubmitBtn: document.getElementById('indivSubmitBtn'),
   indivFeedback: document.getElementById('indivFeedback'),
-  individualForm: document.getElementById('individualForm')
+  individualForm: document.getElementById('individualForm'),
+
+  // Pagination elements
+  paginationContainer: document.getElementById('paginationContainer'),
+  paginationInfo: document.getElementById('paginationInfo'),
+  prevPageBtn: document.getElementById('prevPageBtn'),
+  nextPageBtn: document.getElementById('nextPageBtn'),
+  pageNumbers: document.getElementById('pageNumbers'),
+
+  // Milestone Banner elements
+  milestoneBanner: document.getElementById('milestoneBanner'),
+  milestoneBannerText: document.getElementById('milestoneBannerText'),
+  milestoneDismissBtn: document.getElementById('milestoneDismissBtn'),
+  milestoneDownloadCsvBtn: document.getElementById('milestoneDownloadCsvBtn'),
+  milestoneDownloadExcelBtn: document.getElementById('milestoneDownloadExcelBtn')
 };
 
 // Initialize Application
@@ -145,11 +167,13 @@ function setupEventListeners() {
   // Table filtering
   elements.searchInput.addEventListener('input', (e) => {
     state.filter.search = e.target.value.toLowerCase();
+    state.pagination.currentPage = 1;
     renderTable();
   });
 
   elements.deptFilterSelect.addEventListener('change', (e) => {
     state.filter.department = e.target.value;
+    state.pagination.currentPage = 1;
     renderTable();
   });
 
@@ -158,13 +182,39 @@ function setupEventListeners() {
       elements.filterPills.forEach(p => p.classList.remove('active'));
       pill.classList.add('active');
       state.filter.status = pill.dataset.status;
+      state.pagination.currentPage = 1;
       renderTable();
     });
   });
 
+  // Pagination navigation
+  if (elements.prevPageBtn) {
+    elements.prevPageBtn.addEventListener('click', () => {
+      if (state.pagination.currentPage > 1) {
+        state.pagination.currentPage--;
+        renderTable();
+      }
+    });
+  }
+
+  if (elements.nextPageBtn) {
+    elements.nextPageBtn.addEventListener('click', () => {
+      state.pagination.currentPage++;
+      renderTable();
+    });
+  }
+
   // Exports
   elements.exportExcelBtn.addEventListener('click', () => window.location.href = '/api/export/excel');
   elements.exportCsvBtn.addEventListener('click', () => window.location.href = '/api/export/csv');
+
+  if (elements.milestoneDownloadCsvBtn) {
+    elements.milestoneDownloadCsvBtn.addEventListener('click', () => window.location.href = '/api/export/csv');
+  }
+
+  if (elements.milestoneDownloadExcelBtn) {
+    elements.milestoneDownloadExcelBtn.addEventListener('click', () => window.location.href = '/api/export/excel');
+  }
 
   // Close modals on click outside or close button
   document.querySelectorAll('.modal-backdrop').forEach(modal => {
@@ -474,6 +524,7 @@ async function startBatchDiscovery() {
 
 // Render Entire Dashboard
 function renderAll() {
+  state.pagination.currentPage = 1;
   renderKPIs();
   populateDepartmentFilter();
   renderCharts();
@@ -511,10 +562,11 @@ function renderCharts() {
   const textColor = isDark ? '#94a3b8' : '#475569';
   const gridColor = isDark ? 'rgba(255, 255, 255, 0.06)' : 'rgba(0, 0, 0, 0.06)';
 
-  // 1. Department Citations Chart
+  // 1. Department Citations Chart — Display all extracted departments
   const deptData = state.analytics?.departments || [];
-  const deptLabels = deptData.slice(0, 7).map(d => d.department.length > 18 ? d.department.substring(0, 16) + '...' : d.department);
-  const deptCitations = deptData.slice(0, 7).map(d => d.total_citations);
+  const deptFullNames = deptData.map(d => d.department || 'Unassigned');
+  const deptLabels = deptData.map(d => d.department && d.department.length > 20 ? d.department.substring(0, 18) + '...' : (d.department || 'Unassigned'));
+  const deptCitations = deptData.map(d => d.total_citations || 0);
 
   if (state.deptChartInstance) {
     state.deptChartInstance.destroy();
@@ -537,7 +589,15 @@ function renderCharts() {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { display: false }
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: function(context) {
+              const idx = context[0].dataIndex;
+              return deptFullNames[idx] || context[0].label;
+            }
+          }
+        }
       },
       scales: {
         x: {
@@ -625,7 +685,7 @@ function renderLeaderboard() {
   });
 }
 
-// Render Staff Roster Table with Live Filtering
+// Render Staff Roster Table with Live Filtering & Pagination (10 per page)
 function renderTable() {
   const filtered = state.records.filter(r => {
     // Search filter
@@ -651,10 +711,26 @@ function renderTable() {
     return matchesSearch && matchesDept && matchesStatus;
   });
 
-  elements.tableCountLabel.textContent = `Showing ${filtered.length} of ${state.records.length} faculty`;
+  const pageSize = state.pagination.pageSize || 10;
+  const totalItems = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  
+  if (state.pagination.currentPage > totalPages) {
+    state.pagination.currentPage = totalPages;
+  }
+  if (state.pagination.currentPage < 1) {
+    state.pagination.currentPage = 1;
+  }
+
+  const startIdx = (state.pagination.currentPage - 1) * pageSize;
+  const endIdx = Math.min(startIdx + pageSize, totalItems);
+  const paged = filtered.slice(startIdx, endIdx);
+
   elements.tableBody.innerHTML = '';
 
-  if (filtered.length === 0) {
+  if (totalItems === 0) {
+    elements.tableCountLabel.textContent = `Showing 0 faculty`;
+    if (elements.paginationContainer) elements.paginationContainer.style.display = 'none';
     elements.tableBody.innerHTML = `
       <tr>
         <td colspan="9">
@@ -665,10 +741,40 @@ function renderTable() {
         </td>
       </tr>
     `;
+    checkMilestoneBanner();
     return;
   }
 
-  filtered.forEach(row => {
+  // Update table count & pagination bar
+  const isFiltered = totalItems !== state.records.length;
+  elements.tableCountLabel.textContent = `Showing ${startIdx + 1}–${endIdx} of ${totalItems} faculty${isFiltered ? ` (${state.records.length} total)` : ''}`;
+
+  if (elements.paginationContainer) {
+    elements.paginationContainer.style.display = totalItems > pageSize ? 'flex' : 'none';
+    if (elements.paginationInfo) {
+      elements.paginationInfo.textContent = `Showing ${startIdx + 1}–${endIdx} of ${totalItems} faculty (Page ${state.pagination.currentPage} of ${totalPages})`;
+    }
+    if (elements.prevPageBtn) elements.prevPageBtn.disabled = (state.pagination.currentPage === 1);
+    if (elements.nextPageBtn) elements.nextPageBtn.disabled = (state.pagination.currentPage === totalPages);
+
+    if (elements.pageNumbers) {
+      elements.pageNumbers.innerHTML = '';
+      const startPage = Math.max(1, state.pagination.currentPage - 2);
+      const endPage = Math.min(totalPages, startPage + 4);
+      for (let p = startPage; p <= endPage; p++) {
+        const btn = document.createElement('button');
+        btn.className = `page-num-btn ${p === state.pagination.currentPage ? 'active' : ''}`;
+        btn.textContent = p;
+        btn.onclick = () => {
+          state.pagination.currentPage = p;
+          renderTable();
+        };
+        elements.pageNumbers.appendChild(btn);
+      }
+    }
+  }
+
+  paged.forEach(row => {
     const tr = document.createElement('tr');
     
     // Status Badge
@@ -721,7 +827,30 @@ function renderTable() {
     `;
     elements.tableBody.appendChild(tr);
   });
+
+  checkMilestoneBanner();
 }
+
+// 30+ Records Milestone Alert Banner Management
+function checkMilestoneBanner() {
+  if (!elements.milestoneBanner) return;
+  const total = state.records.length;
+  if (total >= 30 && !state.milestoneBannerDismissed) {
+    if (elements.milestoneBannerText) {
+      elements.milestoneBannerText.textContent = `You have accumulated ${total} faculty profiles in this session. We recommend downloading your report (CSV / Excel) to safeguard your data before proceeding.`;
+    }
+    elements.milestoneBanner.style.display = 'flex';
+  } else {
+    elements.milestoneBanner.style.display = 'none';
+  }
+}
+
+window.dismissMilestoneBanner = function() {
+  state.milestoneBannerDismissed = true;
+  if (elements.milestoneBanner) {
+    elements.milestoneBanner.style.display = 'none';
+  }
+};
 
 // Add Individual Faculty Profile Handler
 window.handleAddIndividual = async function() {
@@ -776,10 +905,11 @@ window.handleAddIndividual = async function() {
       showCreditAlertBanner();
     }
 
-    // Refresh all UI widgets
+    // Refresh all UI widgets & jump to page 1 for immediate visibility
+    state.pagination.currentPage = 1;
     elements.exportExcelBtn.disabled = false;
     elements.exportCsvBtn.disabled = false;
-    updateKPIs();
+    renderKPIs();
     renderCharts();
     renderLeaderboard();
     populateDepartmentFilter();
@@ -789,6 +919,25 @@ window.handleAddIndividual = async function() {
     if (elements.indivFeedback) {
       elements.indivFeedback.className = 'individual-feedback success';
       elements.indivFeedback.textContent = `✓ Successfully added ${newRec.staff_name} (${(newRec.citations_all || 0).toLocaleString()} Citations, h-index ${newRec.h_index_all || 0})`;
+    }
+    elements.indivNameInput.value = '';
+    if (elements.indivDeptInput) elements.indivDeptInput.value = '';
+
+    setTimeout(() => {
+      if (elements.indivFeedback) elements.indivFeedback.style.display = 'none';
+    }, 5000);
+
+  } catch (err) {
+    console.error('Error adding individual profile:', err);
+    if (elements.indivFeedback) {
+      elements.indivFeedback.className = 'individual-feedback error';
+      elements.indivFeedback.textContent = `❌ ${err.message}`;
+    }
+  } finally {
+    elements.indivSubmitBtn.disabled = false;
+    elements.indivSubmitBtn.textContent = originalText;
+  }
+};
     }
     elements.indivNameInput.value = '';
     if (elements.indivDeptInput) elements.indivDeptInput.value = '';

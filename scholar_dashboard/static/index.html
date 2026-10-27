@@ -238,6 +238,24 @@
 
     <!-- Detailed Roster & Verification Workhorse Grid -->
     <section class="table-panel">
+      <!-- 30+ Records Session Milestone Alert Banner -->
+      <div id="milestoneBanner" class="milestone-banner" style="display: none;">
+        <div class="milestone-content">
+          <div class="milestone-icon-box">📁</div>
+          <div>
+            <div class="milestone-title">Session Milestone: 30+ Faculty Records Extracted</div>
+            <div id="milestoneBannerText" class="milestone-desc">
+              You have accumulated 30+ faculty profiles in this session. We recommend downloading your report to safeguard your data.
+            </div>
+          </div>
+        </div>
+        <div class="milestone-actions">
+          <button id="milestoneDownloadCsvBtn" class="btn btn-success btn-sm">📥 Download CSV</button>
+          <button id="milestoneDownloadExcelBtn" class="btn btn-secondary btn-sm">📊 Export Excel</button>
+          <button id="milestoneDismissBtn" class="btn btn-ghost btn-sm" onclick="dismissMilestoneBanner()">Dismiss / Continue</button>
+        </div>
+      </div>
+
       <div class="table-toolbar">
         <div>
           <h3 class="panel-title">📊 Extraction Results</h3>
@@ -298,6 +316,16 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Table Pagination Bar (10 per page) -->
+      <div id="paginationContainer" class="pagination-bar" style="display: none;">
+        <div id="paginationInfo" class="pagination-info">Showing 1–10 of 10 faculty</div>
+        <div class="pagination-controls">
+          <button id="prevPageBtn" class="btn btn-secondary btn-sm" disabled>◀ Prev</button>
+          <div id="pageNumbers" class="page-numbers"></div>
+          <button id="nextPageBtn" class="btn btn-secondary btn-sm" disabled>Next ▶</button>
+        </div>
       </div>
     </section>
 

@@ -106,3 +106,32 @@ def extract_staff_records(df: pd.DataFrame, name_col: str, dept_col: Optional[st
             "raw_index": idx
         })
     return records
+
+
+def extract_department_from_affiliation(affiliation: str) -> str:
+    """Intelligently infer department from academic affiliation text if available."""
+    if not affiliation or not isinstance(affiliation, str):
+        return ""
+    import re
+    # Patterns like "Department of Chemistry", "Dept. of Computer Science", "Faculty of Law"
+    m = re.search(r"(?:department|dept\.?)\s+of\s+([^,;.]+)", affiliation, re.IGNORECASE)
+    if m:
+        return m.group(1).strip()
+    m = re.search(r"faculty\s+of\s+([^,;.]+)", affiliation, re.IGNORECASE)
+    if m:
+        return m.group(1).strip()
+    m = re.search(r"(?:professor|prof\.?|dr\.?|lecturer|reader|assoc\.?\s+prof\.?)\s+of\s+([^,;.]+)", affiliation, re.IGNORECASE)
+    if m:
+        return m.group(1).strip()
+
+    # Match common direct department/discipline keywords
+    KNOWN_DEPTS = [
+        "Chemistry", "Computer Science", "Computer Sciences", "Botany", "Microbiology",
+        "Medical Microbiology", "Geosciences", "Public Administration", "Marine Sciences",
+        "Pharmacology", "Business Administration", "Biochemistry", "Physics", "Economics",
+        "Law", "Mathematics", "Zoology", "Engineering", "Civil Engineering", "Philosophy"
+    ]
+    for d in KNOWN_DEPTS:
+        if re.search(r"\b" + re.escape(d) + r"\b", affiliation, re.IGNORECASE):
+            return d
+    return ""

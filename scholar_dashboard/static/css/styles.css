@@ -1185,6 +1185,118 @@ input[type="checkbox"]:focus-visible + .toggle-switch {
   gap: 18px;
 }
 
+/* 30+ Records Session Milestone Alert Banner */
+.milestone-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.12) 0%, rgba(153, 27, 27, 0.1) 100%);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.15);
+  flex-wrap: wrap;
+  animation: fadeIn 0.3s ease;
+}
+
+.milestone-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.milestone-icon-box {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.milestone-title {
+  font-weight: 700;
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+.milestone-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.milestone-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+}
+
+.btn-ghost:hover {
+  color: var(--text-main);
+  background: var(--bg-card-hover);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Pagination Bar (10 Lecturers at a time) */
+.pagination-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pagination-info {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.page-numbers {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.page-num-btn {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 6px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-input);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--trans-fast);
+}
+
+.page-num-btn:hover {
+  color: var(--text-main);
+  border-color: var(--accent-primary);
+}
+
+.page-num-btn.active {
+  background: var(--accent-primary);
+  color: #ffffff;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 10px var(--accent-primary-glow);
+}
+
 .table-toolbar {
   display: flex;
   justify-content: space-between;
