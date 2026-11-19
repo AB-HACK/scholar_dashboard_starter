@@ -29,6 +29,51 @@ const state = {
 // Safe alias to prevent any undefined function reference
 const updateKPIs = () => renderKPIs();
 
+// Built-in Sample Roster Fallback (ensures Load Sample Roster works even if opened via Live Server or file://)
+const FALLBACK_SAMPLE_RECORDS = [
+  { id: "staff_0", name: "Prof. Luqman A. Adams", department: "Chemistry", raw_index: 0 },
+  { id: "staff_1", name: "Prof. Oluwatoyin Temitayo Ogundipe", department: "Botany", raw_index: 1 },
+  { id: "staff_2", name: "Prof. Folasade Tolulope Ogunsola", department: "Medical Microbiology", raw_index: 2 },
+  { id: "staff_3", name: "Prof. Babajide Alo", department: "Chemistry", raw_index: 3 },
+  { id: "staff_4", name: "Prof. Kehinde Olayinka", department: "Chemistry", raw_index: 4 },
+  { id: "staff_5", name: "Dr. Chika Yinka-Banjo", department: "Computer Sciences", raw_index: 5 },
+  { id: "staff_6", name: "Prof. Elijah Ayolabi", department: "Geosciences", raw_index: 6 },
+  { id: "staff_7", name: "Dr. Isaac A. Omoleke", department: "Public Administration", raw_index: 7 },
+  { id: "staff_8", name: "Prof. Lucian Obinna Chukwu", department: "Marine Sciences", raw_index: 8 },
+  { id: "staff_9", name: "Dr. Mary Kehinde Ladapo", department: "Pharmacology", raw_index: 9 },
+  { id: "staff_10", name: "Prof. Sunday Adebisi", department: "Business Administration", raw_index: 10 },
+  { id: "staff_11", name: "Dr. Hakeem Olanrewaju Amuda", department: "Metallurgical & Materials", raw_index: 11 },
+  { id: "staff_12", name: "Dr. Grace O. Babafemi", department: "Biochemistry", raw_index: 12 }
+];
+
+// Smart API base resolver: supports FastAPI (:8000), Vercel, Live Server (:5500), and file://
+let resolvedApiBase = (window.location.protocol === 'file:' || (['localhost', '127.0.0.1'].includes(window.location.hostname) && window.location.port && window.location.port !== '8000'))
+  ? 'http://127.0.0.1:8000'
+  : '';
+
+async function apiFetch(path, options = {}) {
+  const primaryUrl = `${resolvedApiBase}${path}`;
+  try {
+    const res = await fetch(primaryUrl, options);
+    const contentType = res.headers.get('content-type') || '';
+    if (res.ok && contentType.includes('application/json')) {
+      return res;
+    }
+    // If opened on another local port that returned HTML 404, fall back to FastAPI on 127.0.0.1:8000
+    if (resolvedApiBase === '' && ['localhost', '127.0.0.1'].includes(window.location.hostname) && window.location.port !== '8000') {
+      resolvedApiBase = 'http://127.0.0.1:8000';
+      return await fetch(`${resolvedApiBase}${path}`, options);
+    }
+    return res;
+  } catch (err) {
+    if (resolvedApiBase === '') {
+      resolvedApiBase = 'http://127.0.0.1:8000';
+      return await fetch(`${resolvedApiBase}${path}`, options);
+    }
+    throw err;
+  }
+}
+
 // DOM Elements
 const elements = {
   statusPill: document.getElementById('statusPill'),
@@ -206,15 +251,15 @@ function setupEventListeners() {
   }
 
   // Exports
-  elements.exportExcelBtn.addEventListener('click', () => window.location.href = '/api/export/excel');
-  elements.exportCsvBtn.addEventListener('click', () => window.location.href = '/api/export/csv');
+  elements.exportExcelBtn.addEventListener('click', () => window.location.href = `${resolvedApiBase}/api/export/excel`);
+  elements.exportCsvBtn.addEventListener('click', () => window.location.href = `${resolvedApiBase}/api/export/csv`);
 
   if (elements.milestoneDownloadCsvBtn) {
-    elements.milestoneDownloadCsvBtn.addEventListener('click', () => window.location.href = '/api/export/csv');
+    elements.milestoneDownloadCsvBtn.addEventListener('click', () => window.location.href = `${resolvedApiBase}/api/export/csv`);
   }
 
   if (elements.milestoneDownloadExcelBtn) {
-    elements.milestoneDownloadExcelBtn.addEventListener('click', () => window.location.href = '/api/export/excel');
+    elements.milestoneDownloadExcelBtn.addEventListener('click', () => window.location.href = `${resolvedApiBase}/api/export/excel`);
   }
 
   // Close modals on click outside or close button
@@ -255,7 +300,7 @@ function setupEventListeners() {
 // Check Backend Status
 async function checkSystemStatus() {
   try {
-    const res = await fetch('/api/status');
+    const res = await apiFetch('/api/status');
     const data = await res.json();
     state.hasApiKey = data.has_api_key;
     state.institution = data.institution || 'University of Lagos';
@@ -271,7 +316,7 @@ async function checkSystemStatus() {
     await fetchAccountInfo();
   } catch (err) {
     console.error('Failed to connect to backend API:', err);
-    elements.statusText.textContent = 'API Offline';
+    elements.statusText.textContent = 'API Offline (Start Python Server)';
   }
 }
 
@@ -292,7 +337,7 @@ function updateStatusPill() {
 async function fetchAccountInfo() {
   try {
     const mockParam = state.useMock ? '&use_mock=true' : '';
-    const res = await fetch(`/api/account?${mockParam}`);
+    const res = await apiFetch(`/api/account?${mockParam}`);
     const data = await res.json();
     state.accountInfo = data;
     updateCreditBadge();
@@ -415,7 +460,7 @@ async function handleFileUpload(file) {
   elements.uploadInfoText.textContent = `Analyzing ${file.name}...`;
 
   try {
-    const res = await fetch('/api/upload', {
+    const res = await apiFetch('/api/upload', {
       method: 'POST',
       body: formData
     });
@@ -437,16 +482,22 @@ async function handleFileUpload(file) {
 // Load Pre-built Sample Data
 async function loadSampleData() {
   try {
-    const res = await fetch('/api/sample');
+    const res = await apiFetch('/api/sample');
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
     const data = await res.json();
-    state.uploadedRecords = data.extracted_records;
-    elements.uploadInfo.style.display = 'block';
-    elements.uploadInfoText.textContent = `Loaded sample chemistry & sciences roster (${data.extracted_count} faculty members)`;
-    elements.runBtn.disabled = false;
-    elements.runBtn.textContent = `🚀 Run Discovery for ${data.extracted_count} Staff`;
+    state.uploadedRecords = data.extracted_records || FALLBACK_SAMPLE_RECORDS;
   } catch (err) {
-    alert('Failed to load sample data.');
+    console.warn('Using built-in sample roster fallback:', err);
+    state.uploadedRecords = FALLBACK_SAMPLE_RECORDS.map(r => ({ ...r }));
   }
+
+  const count = state.uploadedRecords.length;
+  elements.uploadInfo.style.display = 'block';
+  elements.uploadInfoText.textContent = `Loaded sample chemistry & sciences roster (${count} faculty members)`;
+  elements.runBtn.disabled = false;
+  elements.runBtn.textContent = `🚀 Run Discovery for ${count} Staff`;
 }
 
 // Start Batch Discovery
@@ -465,7 +516,7 @@ async function startBatchDiscovery() {
   // Poll progress in background
   const pollInterval = setInterval(async () => {
     try {
-      const sRes = await fetch('/api/status');
+      const sRes = await apiFetch('/api/status');
       const sData = await sRes.json();
       elements.progressFill.style.width = `${sData.progress}%`;
       elements.progressPct.textContent = `${Math.round(sData.progress)}%`;
@@ -477,7 +528,7 @@ async function startBatchDiscovery() {
   }, 400);
 
   try {
-    const res = await fetch('/api/discover', {
+    const res = await apiFetch('/api/discover', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -877,7 +928,7 @@ window.handleAddIndividual = async function() {
   }
 
   try {
-    const res = await fetch('/api/individual', {
+    const res = await apiFetch('/api/individual', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -971,7 +1022,7 @@ window.toggleVerifyStatus = async function(staffId) {
 
   const newStatus = staff.match_status === 'Verified' ? 'Needs verification' : 'Verified';
   try {
-    const res = await fetch('/api/verify', {
+    const res = await apiFetch('/api/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1037,7 +1088,7 @@ window.openDisambiguationModal = function(staffId) {
 window.selectCandidate = async function(authorId, name, affiliation) {
   if (!state.activeModalStaff) return;
   try {
-    const res = await fetch('/api/verify', {
+    const res = await apiFetch('/api/verify', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -1095,7 +1146,7 @@ async function saveConfiguration() {
   const institution = document.getElementById('configInstitution').value.trim();
 
   try {
-    await fetch('/api/config', {
+    await apiFetch('/api/config', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ api_key: apiKey, institution: institution })
