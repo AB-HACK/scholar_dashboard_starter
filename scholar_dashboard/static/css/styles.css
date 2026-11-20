@@ -1708,3 +1708,149 @@ input[type="checkbox"]:focus-visible + .toggle-switch {
     padding: 16px;
   }
 }
+
+/* ==========================================================================
+   VECTOR SVG ICON SYSTEM & METALLIC RANK BADGES
+   ========================================================================== */
+
+.svg-icon {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.brand-icon.unilag-crest {
+  color: #fde68a;
+}
+
+.title-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-primary);
+}
+
+.chart-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.account-card-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.credit-icon,
+.search-icon,
+.individual-icon,
+.alert-icon-box,
+.milestone-icon-box,
+.empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.alert-icon-box {
+  color: var(--accent-warning);
+}
+
+.credit-alert-banner.critical .alert-icon-box,
+.credit-alert-banner.depleted .alert-icon-box {
+  color: var(--accent-danger);
+}
+
+.milestone-icon-box {
+  color: var(--accent-warning);
+}
+
+.candidate-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.individual-feedback {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@keyframes iconSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.icon-spin {
+  animation: iconSpin 0.9s linear infinite;
+}
+
+/* Leaderboard Rank Badges */
+.leaderboard-rank {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 34px;
+}
+
+.rank-medal-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 3px 8px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.rank-medal-badge.top-1 {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.rank-medal-badge.top-2 {
+  background: rgba(148, 163, 184, 0.16);
+  color: #cbd5e1;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.rank-medal-badge.top-3 {
+  background: rgba(217, 119, 6, 0.16);
+  color: #f59e0b;
+  border: 1px solid rgba(217, 119, 6, 0.35);
+}
+
+[data-theme="light"] .rank-medal-badge.top-1 {
+  color: #b45309;
+  background: rgba(245, 158, 11, 0.14);
+}
+
+[data-theme="light"] .rank-medal-badge.top-2 {
+  color: #475569;
+  background: rgba(148, 163, 184, 0.18);
+}
+
+[data-theme="light"] .rank-medal-badge.top-3 {
+  color: #92400e;
+  background: rgba(217, 119, 6, 0.14);
+}
+
+.rank-num-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}

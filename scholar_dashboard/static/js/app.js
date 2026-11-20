@@ -29,6 +29,25 @@ const state = {
 // Safe alias to prevent any undefined function reference
 const updateKPIs = () => renderKPIs();
 
+// Standard Lucide Vector SVG Icons
+const ICONS = {
+  sun: `<svg class="svg-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`,
+  moon: `<svg class="svg-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>`,
+  play: `<svg class="svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>`,
+  sparkles: `<svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/></svg>`,
+  loader: `<svg class="svg-icon icon-spin" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>`,
+  externalLink: `<svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>`,
+  checkCircle: `<svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>`,
+  alertCircle: `<svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`,
+  xCircle: `<svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>`,
+  alertTriangle: `<svg class="svg-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>`,
+  alertOctagon: `<svg class="svg-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>`,
+  ban: `<svg class="svg-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg>`,
+  mail: `<svg class="svg-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>`,
+  searchX: `<svg class="svg-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m13.5 8.5-5 5"/><path d="m8.5 8.5 5 5"/><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>`,
+  medal: `<svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15"/><path d="M11 12 5.12 2.2"/><path d="m13 12 5.88-9.8"/><path d="M8 7h8"/><circle cx="12" cy="17" r="5"/><path d="M12 18v-2h-.5"/></svg>`
+};
+
 // Built-in Sample Roster Fallback (ensures Load Sample Roster works even if opened via Live Server or file://)
 const FALLBACK_SAMPLE_RECORDS = [
   { id: "staff_0", name: "Prof. Luqman A. Adams", department: "Chemistry", raw_index: 0 },
@@ -437,14 +456,18 @@ function showCreditAlertBanner() {
     elements.creditAlertBanner.classList.add(status);
   }
 
+  const iconBox = document.getElementById('creditAlertIconBox');
   if (status === 'depleted') {
-    elements.creditAlertTitle.textContent = '🚫 Credit Balance Depleted';
+    if (iconBox) iconBox.innerHTML = ICONS.ban;
+    elements.creditAlertTitle.textContent = 'Credit Balance Depleted';
     elements.creditAlertDesc.textContent = info.warning;
   } else if (status === 'critical') {
-    elements.creditAlertTitle.textContent = '🔴 Critically Low Credits';
+    if (iconBox) iconBox.innerHTML = ICONS.alertOctagon;
+    elements.creditAlertTitle.textContent = 'Critically Low Credits';
     elements.creditAlertDesc.textContent = info.warning;
   } else {
-    elements.creditAlertTitle.textContent = '⚠️ Low Credit Warning';
+    if (iconBox) iconBox.innerHTML = ICONS.alertTriangle;
+    elements.creditAlertTitle.textContent = 'Low Credit Warning';
     elements.creditAlertDesc.textContent = info.warning;
   }
 
@@ -472,7 +495,7 @@ async function handleFileUpload(file) {
     state.uploadedRecords = data.extracted_records;
     elements.uploadInfoText.textContent = `Loaded ${data.extracted_count} staff records from ${data.filename} (${data.detected_name_col || 'Name'} & ${data.detected_dept_col || 'Dept'})`;
     elements.runBtn.disabled = false;
-    elements.runBtn.textContent = `🚀 Run Discovery for ${data.extracted_count} Staff`;
+    elements.runBtn.innerHTML = `${ICONS.sparkles} Run Discovery for ${data.extracted_count} Staff`;
   } catch (err) {
     alert(`File upload error: ${err.message}`);
     elements.uploadInfo.style.display = 'none';
@@ -497,7 +520,7 @@ async function loadSampleData() {
   elements.uploadInfo.style.display = 'block';
   elements.uploadInfoText.textContent = `Loaded sample chemistry & sciences roster (${count} faculty members)`;
   elements.runBtn.disabled = false;
-  elements.runBtn.textContent = `🚀 Run Discovery for ${count} Staff`;
+  elements.runBtn.innerHTML = `${ICONS.sparkles} Run Discovery for ${count} Staff`;
 }
 
 // Start Batch Discovery
@@ -717,7 +740,9 @@ function renderLeaderboard() {
     const row = document.createElement('div');
     row.className = 'leaderboard-row';
     const rankClass = item.rank === 1 ? 'top-1' : (item.rank === 2 ? 'top-2' : (item.rank === 3 ? 'top-3' : ''));
-    const rankDisplay = item.rank === 1 ? '🥇' : (item.rank === 2 ? '🥈' : (item.rank === 3 ? '🥉' : item.rank));
+    const rankDisplay = item.rank <= 3
+      ? `<span class="rank-medal-badge ${rankClass}" title="Rank #${item.rank}">${ICONS.medal}<span>${item.rank}</span></span>`
+      : `<span class="rank-num-badge">${item.rank}</span>`;
 
     row.innerHTML = `
       <div class="leaderboard-author">
@@ -736,7 +761,7 @@ function renderLeaderboard() {
           <span class="stat-label">h-Index</span>
           <span class="stat-num">${item.h_index_all}</span>
         </div>
-        ${item.profile_url ? `<a href="${item.profile_url}" target="_blank" class="btn btn-secondary btn-sm" title="View Google Scholar">🔗</a>` : ''}
+        ${item.profile_url ? `<a href="${item.profile_url}" target="_blank" class="btn btn-secondary btn-sm" title="View Google Scholar" aria-label="View Google Scholar">${ICONS.externalLink}</a>` : ''}
       </div>
     `;
     elements.leaderboardList.appendChild(row);
@@ -793,7 +818,7 @@ function renderTable() {
       <tr>
         <td colspan="9">
           <div class="empty-state">
-            <span class="empty-icon">🔍</span>
+            <span class="empty-icon">${ICONS.searchX}</span>
             <p>No matching lecturer records found.</p>
           </div>
         </td>
@@ -874,9 +899,9 @@ function renderTable() {
       <td style="text-align: center;">
         <div style="display: flex; gap: 6px; justify-content: center; align-items: center; flex-wrap: wrap;">
           <span class="badge ${badgeClass}" style="cursor: pointer" onclick="toggleVerifyStatus('${row.id}')" title="Click to toggle status">
-            ${statusText === 'Verified' ? '✓ Verified' : (statusText === 'Needs verification' ? '⚠ Review' : '✕ Unmatched')}
+            ${statusText === 'Verified' ? `${ICONS.checkCircle} Verified` : (statusText === 'Needs verification' ? `${ICONS.alertCircle} Review` : `${ICONS.xCircle} Unmatched`)}
           </span>
-          ${row.profile_url ? `<a href="${row.profile_url}" target="_blank" class="btn btn-secondary btn-xs" title="Open Google Scholar">🔗</a>` : ''}
+          ${row.profile_url ? `<a href="${row.profile_url}" target="_blank" class="btn btn-secondary btn-xs" title="Open Google Scholar" aria-label="Open Google Scholar">${ICONS.externalLink}</a>` : ''}
           <button class="btn btn-secondary btn-xs" onclick="openDisambiguationModal('${row.id}')" title="Review candidate profiles">
             Review (${row.candidate_count || (row.candidates ? row.candidates.length : 0)})
           </button>
@@ -918,8 +943,8 @@ window.handleAddIndividual = async function() {
   if (!name) return;
 
   elements.indivSubmitBtn.disabled = true;
-  const originalText = elements.indivSubmitBtn.textContent;
-  elements.indivSubmitBtn.textContent = '⏳ Searching...';
+  const originalHtml = elements.indivSubmitBtn.innerHTML;
+  elements.indivSubmitBtn.innerHTML = `${ICONS.loader} Searching...`;
 
   if (elements.indivFeedback) {
     elements.indivFeedback.style.display = 'block';
@@ -994,7 +1019,7 @@ window.handleAddIndividual = async function() {
     // Positive feedback
     if (elements.indivFeedback) {
       elements.indivFeedback.className = 'individual-feedback success';
-      elements.indivFeedback.textContent = `✓ Successfully added ${newRec.staff_name} (${(newRec.citations_all || 0).toLocaleString()} Citations, h-index ${newRec.h_index_all || 0})`;
+      elements.indivFeedback.innerHTML = `${ICONS.checkCircle} Successfully added ${escapeHtml(newRec.staff_name)} (${(newRec.citations_all || 0).toLocaleString()} Citations, h-index ${newRec.h_index_all || 0})`;
     }
     elements.indivNameInput.value = '';
     if (elements.indivDeptInput) elements.indivDeptInput.value = '';
@@ -1007,11 +1032,11 @@ window.handleAddIndividual = async function() {
     console.error('Error adding individual profile:', err);
     if (elements.indivFeedback) {
       elements.indivFeedback.className = 'individual-feedback error';
-      elements.indivFeedback.textContent = `❌ ${err.message}`;
+      elements.indivFeedback.innerHTML = `${ICONS.xCircle} ${escapeHtml(err.message)}`;
     }
   } finally {
     elements.indivSubmitBtn.disabled = false;
-    elements.indivSubmitBtn.textContent = originalText;
+    elements.indivSubmitBtn.innerHTML = originalHtml;
   }
 };
 
@@ -1066,12 +1091,12 @@ window.openDisambiguationModal = function(staffId) {
         <div class="candidate-info">
           <span class="candidate-name">${escapeHtml(cand.name)} ${isCurrent ? '(Active Match)' : ''}</span>
           <span class="candidate-affil">${escapeHtml(cand.affiliations || 'No affiliation stated')}</span>
-          ${cand.email ? `<span class="candidate-email">✉️ ${escapeHtml(cand.email)}</span>` : ''}
+          ${cand.email ? `<span class="candidate-email">${ICONS.mail} ${escapeHtml(cand.email)}</span>` : ''}
           ${cand.author_id ? `<span style="font-size: 10px; color: var(--text-faint)">ID: ${cand.author_id}</span>` : ''}
         </div>
         <div>
           ${isCurrent 
-            ? '<span class="badge badge-verified">✓ Selected</span>' 
+            ? `<span class="badge badge-verified">${ICONS.checkCircle} Selected</span>` 
             : `<button class="btn btn-primary btn-sm" onclick="selectCandidate('${cand.author_id}', '${escapeHtml(cand.name)}', '${escapeHtml(cand.affiliations || '')}')">Select This</button>`
           }
         </div>
@@ -1184,7 +1209,7 @@ function toggleTheme() {
 }
 
 function updateThemeIcon(theme) {
-  elements.themeToggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+  elements.themeToggleBtn.innerHTML = theme === 'dark' ? ICONS.sun : ICONS.moon;
 }
 
 // Utility: Escape HTML

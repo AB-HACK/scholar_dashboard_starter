@@ -24,7 +24,9 @@
     <!-- Top Navigation Bar -->
     <header class="topbar">
       <div class="brand-wrapper">
-        <div class="brand-icon unilag-crest">🎓</div>
+        <div class="brand-icon unilag-crest" aria-hidden="true">
+          <svg class="svg-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></svg>
+        </div>
         <div>
           <div class="brand-title">
             University of Lagos
@@ -40,11 +42,17 @@
           <span id="statusText">Checking status...</span>
         </div>
         <div id="creditBadge" class="credit-pill" title="SerpApi Remaining Searches (Click to view details)">
-          <span class="credit-icon">⚡</span>
+          <span class="credit-icon" aria-hidden="true">
+            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></svg>
+          </span>
           <span id="creditText">Credits: —</span>
         </div>
-        <button id="themeToggleBtn" class="btn btn-secondary btn-icon" title="Toggle Theme">☀️</button>
-        <button id="settingsBtn" class="btn btn-secondary btn-icon" title="API Configuration & Quota">⚙️</button>
+        <button id="themeToggleBtn" class="btn btn-secondary btn-icon" title="Toggle Theme" aria-label="Toggle Theme">
+          <svg class="svg-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+        </button>
+        <button id="settingsBtn" class="btn btn-secondary btn-icon" title="API Configuration & Quota" aria-label="API Configuration & Quota">
+          <svg class="svg-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
       </div>
     </header>
     <div class="brand-divider"></div>
@@ -53,7 +61,9 @@
     <section class="ingestion-panel">
       <!-- Low Credit / Quota Warning Banner -->
       <div id="creditAlertBanner" class="credit-alert-banner" style="display: none;">
-        <div class="alert-icon-box">⚠️</div>
+        <div id="creditAlertIconBox" class="alert-icon-box" aria-hidden="true">
+          <svg class="svg-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+        </div>
         <div class="alert-content">
           <div id="creditAlertTitle" class="alert-title">Low Credit Warning</div>
           <div id="creditAlertDesc" class="alert-desc">Remaining SerpApi searches are running low.</div>
@@ -66,7 +76,10 @@
       <div class="panel-header">
         <div>
           <h2 class="panel-title">
-            <span>📂</span> Upload Staff Document
+            <span class="title-icon" aria-hidden="true">
+              <svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/><path d="M12 10v6"/><path d="m9 13 3-3 3 3"/></svg>
+            </span>
+            Upload Staff Document
           </h2>
           <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">
             Upload any document containing staff names. The system will automatically extract names and retrieve their Google Scholar metrics.
@@ -86,7 +99,9 @@
         <!-- Dropzone -->
         <div id="dropzone" class="dropzone">
           <input type="file" id="fileInput" accept=".xlsx, .xls, .csv, .json, .txt" style="display: none;">
-          <div class="dropzone-icon">📥</div>
+          <div class="dropzone-icon" aria-hidden="true">
+            <svg class="svg-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 13v8"/><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="m8 17 4-4 4 4"/></svg>
+          </div>
           <div class="dropzone-title">Drop Faculty Excel, CSV, JSON, or TXT here</div>
           <div class="dropzone-sub">Supported: JSON, Word (DOCX), PDF, Text (TXT), Excel (XLSX, XLS), CSV</div>
         </div>
@@ -99,7 +114,8 @@
           </div>
           <div style="display: flex; gap: 8px;">
             <button id="sampleBtn" class="btn btn-secondary" style="flex: 1;" title="Load test faculty roster">
-              🧪 Load Sample Roster
+              <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2"/><path d="M6.453 15h11.094"/><path d="M8.5 2h7"/></svg>
+              Load Sample Roster
             </button>
           </div>
         </div>
@@ -107,7 +123,8 @@
         <!-- Action Runner -->
         <div style="display: flex; flex-direction: column; justify-content: center; gap: 12px;">
           <button id="runBtn" class="btn btn-primary btn-crawler" style="height: 52px; font-size: 15px;" disabled>
-            ▷ Start Scholar Crawler
+            <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+            Start Scholar Crawler
           </button>
           <div id="uploadInfo" style="display: none; font-size: 12px; color: var(--accent-primary); text-align: center;">
             <span id="uploadInfoText"></span>
@@ -119,7 +136,9 @@
       <div class="individual-card">
         <div class="individual-header">
           <div class="individual-title">
-            <span class="individual-icon">👤</span>
+            <span class="individual-icon" aria-hidden="true">
+              <svg class="svg-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg>
+            </span>
             <div>
               <div style="font-weight: 700; color: var(--text-main); font-size: 14px;">+ Add Individual Profile</div>
               <div style="font-size: 12px; color: var(--text-muted);">Search for one person at a time. Results accumulate in your live session roster.</div>
@@ -138,7 +157,8 @@
             </div>
             <div style="display: flex; align-items: flex-end;">
               <button type="submit" id="indivSubmitBtn" class="btn btn-crawler" style="height: 42px; white-space: nowrap; padding: 0 18px;">
-                ▷ Search & Add Profile
+                <svg class="svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                Search & Add Profile
               </button>
             </div>
           </div>
@@ -163,7 +183,9 @@
       <div class="kpi-card">
         <div class="kpi-top">
           <span class="kpi-title">Total Lecturers Ingested</span>
-          <div class="kpi-icon blue">👥</div>
+          <div class="kpi-icon blue" aria-hidden="true">
+            <svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
         </div>
         <div id="kpiTotalStaff" class="kpi-value">—</div>
         <div id="kpiDeptFootprint" class="kpi-footer">Across 0 departments</div>
@@ -172,7 +194,9 @@
       <div class="kpi-card">
         <div class="kpi-top">
           <span class="kpi-title">Profile Match Rate</span>
-          <div class="kpi-icon green">🎯</div>
+          <div class="kpi-icon green" aria-hidden="true">
+            <svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/></svg>
+          </div>
         </div>
         <div id="kpiMatchRate" class="kpi-value">—</div>
         <div id="kpiVerifiedRatio" class="kpi-footer">0 Verified</div>
@@ -181,7 +205,9 @@
       <div class="kpi-card">
         <div class="kpi-top">
           <span class="kpi-title">Total Citations</span>
-          <div class="kpi-icon purple">📈</div>
+          <div class="kpi-icon purple" aria-hidden="true">
+            <svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+          </div>
         </div>
         <div id="kpiTotalCitations" class="kpi-value">—</div>
         <div class="kpi-footer">All-time citations index</div>
@@ -190,7 +216,9 @@
       <div class="kpi-card">
         <div class="kpi-top">
           <span class="kpi-title">Average h-Index</span>
-          <div class="kpi-icon amber">🏆</div>
+          <div class="kpi-icon amber" aria-hidden="true">
+            <svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"/><circle cx="12" cy="8" r="6"/></svg>
+          </div>
         </div>
         <div id="kpiAvgHIndex" class="kpi-value">—</div>
         <div class="kpi-footer">Department benchmark</div>
@@ -202,7 +230,12 @@
       <!-- Department Footprint Chart -->
       <div class="chart-card">
         <div class="chart-header">
-          <h3 class="chart-title">📊 Departmental Citation Footprint</h3>
+          <h3 class="chart-title">
+            <span class="title-icon" aria-hidden="true">
+              <svg class="svg-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+            </span>
+            Departmental Citation Footprint
+          </h3>
           <span style="font-size: 12px; color: var(--text-faint);">Total citations by department</span>
         </div>
         <div class="chart-wrapper">
@@ -213,7 +246,12 @@
       <!-- h-Index Distribution Chart -->
       <div class="chart-card">
         <div class="chart-header">
-          <h3 class="chart-title">🎯 Faculty h-Index Distribution</h3>
+          <h3 class="chart-title">
+            <span class="title-icon" aria-hidden="true">
+              <svg class="svg-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+            </span>
+            Faculty h-Index Distribution
+          </h3>
           <span style="font-size: 12px; color: var(--text-faint);">Productivity tiers</span>
         </div>
         <div class="chart-wrapper">
@@ -225,12 +263,19 @@
     <!-- Research Impact Leaderboard -->
     <section class="chart-card">
       <div class="chart-header">
-        <h3 class="chart-title">🏆 Top Faculty Citation Leaderboard</h3>
+        <h3 class="chart-title">
+          <span class="title-icon" aria-hidden="true">
+            <svg class="svg-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+          </span>
+          Top Faculty Citation Leaderboard
+        </h3>
         <span style="font-size: 12px; color: var(--text-faint);">Ranked by global academic citation count</span>
       </div>
       <div id="leaderboardList" class="leaderboard-list">
         <div class="empty-state">
-          <span class="empty-icon">📈</span>
+          <span class="empty-icon" aria-hidden="true">
+            <svg class="svg-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" x2="18" y1="20" y2="10"/><line x1="12" x2="12" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="14"/></svg>
+          </span>
           <p>Load faculty data or run discovery to populate citation leaders.</p>
         </div>
       </div>
@@ -241,7 +286,9 @@
       <!-- 30+ Records Session Milestone Alert Banner -->
       <div id="milestoneBanner" class="milestone-banner" style="display: none;">
         <div class="milestone-content">
-          <div class="milestone-icon-box">📁</div>
+          <div class="milestone-icon-box" aria-hidden="true">
+            <svg class="svg-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>
+          </div>
           <div>
             <div class="milestone-title">Session Milestone: 30+ Lecturer Records Extracted</div>
             <div id="milestoneBannerText" class="milestone-desc">
@@ -250,21 +297,34 @@
           </div>
         </div>
         <div class="milestone-actions">
-          <button id="milestoneDownloadCsvBtn" class="btn btn-success btn-sm">📥 Download CSV</button>
-          <button id="milestoneDownloadExcelBtn" class="btn btn-secondary btn-sm">📊 Export Excel</button>
+          <button id="milestoneDownloadCsvBtn" class="btn btn-success btn-sm">
+            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+            Download CSV
+          </button>
+          <button id="milestoneDownloadExcelBtn" class="btn btn-secondary btn-sm">
+            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M8 13h2"/><path d="M14 13h2"/><path d="M8 17h2"/><path d="M14 17h2"/></svg>
+            Export Excel
+          </button>
           <button id="milestoneDismissBtn" class="btn btn-ghost btn-sm" onclick="dismissMilestoneBanner()">Dismiss / Continue</button>
         </div>
       </div>
 
       <div class="table-toolbar">
         <div>
-          <h3 class="panel-title">📊 Extraction Results</h3>
+          <h3 class="panel-title">
+            <span class="title-icon" aria-hidden="true">
+              <svg class="svg-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>
+            </span>
+            Extraction Results
+          </h3>
           <div id="tableCountLabel" style="font-size: 12px; color: var(--text-muted);">Showing 0 lecturers</div>
         </div>
 
         <div class="table-filters">
           <div class="search-input-wrapper">
-            <span class="search-icon">🔍</span>
+            <span class="search-icon" aria-hidden="true">
+              <svg class="svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </span>
             <input type="text" id="searchInput" class="text-input" placeholder="Search faculty or department...">
           </div>
 
@@ -281,10 +341,12 @@
 
           <div style="display: flex; gap: 8px;">
             <button id="exportCsvBtn" class="btn btn-success" disabled title="Download Official CSV Report">
-              📥 Download CSV Report
+              <svg class="svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+              Download CSV Report
             </button>
             <button id="exportExcelBtn" class="btn btn-secondary btn-sm" disabled title="Download formatted multi-sheet Excel">
-              📊 Export Excel
+              <svg class="svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M8 13h2"/><path d="M14 13h2"/><path d="M8 17h2"/><path d="M14 17h2"/></svg>
+              Export Excel
             </button>
           </div>
         </div>
@@ -309,7 +371,9 @@
             <tr>
               <td colspan="9">
                 <div class="empty-state">
-                  <span class="empty-icon">📄</span>
+                  <span class="empty-icon" aria-hidden="true">
+                    <svg class="svg-icon" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M8 13h2"/><path d="M14 13h2"/><path d="M8 17h2"/><path d="M14 17h2"/></svg>
+                  </span>
                   <p>Upload a staff document or click "Load Sample Roster" to view metrics.</p>
                 </div>
               </td>
@@ -322,9 +386,15 @@
       <div id="paginationContainer" class="pagination-bar" style="display: none;">
         <div id="paginationInfo" class="pagination-info">Showing 1–10 of 10 faculty</div>
         <div class="pagination-controls">
-          <button id="prevPageBtn" class="btn btn-secondary btn-sm" disabled>◀ Prev</button>
+          <button id="prevPageBtn" class="btn btn-secondary btn-sm" disabled>
+            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            Prev
+          </button>
           <div id="pageNumbers" class="page-numbers"></div>
-          <button id="nextPageBtn" class="btn btn-secondary btn-sm" disabled>Next ▶</button>
+          <button id="nextPageBtn" class="btn btn-secondary btn-sm" disabled>
+            Next
+            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+          </button>
         </div>
       </div>
     </section>
@@ -383,8 +453,14 @@
         <!-- Live SerpApi Quota & Account Info Card -->
         <div class="account-card" id="modalAccountCard">
           <div class="account-card-header">
-            <span class="account-card-title">💳 SerpApi Account & Quota</span>
-            <button id="refreshQuotaBtn" class="btn btn-secondary btn-xs" type="button" title="Fetch live balance from /account endpoint">🔄 Refresh Balance</button>
+            <span class="account-card-title">
+              <svg class="svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>
+              SerpApi Account & Quota
+            </span>
+            <button id="refreshQuotaBtn" class="btn btn-secondary btn-xs" type="button" title="Fetch live balance from /account endpoint">
+              <svg class="svg-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+              Refresh Balance
+            </button>
           </div>
           <div class="account-grid">
             <div class="account-item">
